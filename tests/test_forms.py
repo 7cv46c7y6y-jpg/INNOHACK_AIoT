@@ -108,3 +108,18 @@ def test_bundle_has_three_files(demo):
     assert name.endswith(".zip")
     with zipfile.ZipFile(io.BytesIO(data), metadata_encoding="cp949") as zf:
         assert len(zf.namelist()) == 3
+
+
+@pytest.mark.parametrize("form_id", ["f01", "f02", "f03"])
+def test_table_inside_page_margins(demo, form_id):
+    """서식 표가 한글의 여백 선 밖으로 나가지 않는다 (② 원본은 10mm 나가 있어 템플릿에서 여백을 줄임)."""
+    import re
+    _, data, _ = build(form_id, demo)
+    with zipfile.ZipFile(io.BytesIO(data)) as zf:
+        xml = zf.read("Contents/section0.xml").decode("utf-8")
+    page_w = int(re.search(r'<hp:pagePr\b[^>]*\bwidth="(\d+)"', xml).group(1))
+    margin = re.search(r"<hp:margin\b[^>]*/>", xml).group(0)
+    body = page_w - int(re.search(r'\bleft="(\d+)"', margin).group(1)) - int(re.search(r'\bright="(\d+)"', margin).group(1))
+    t = re.search(r'<hp:tbl\b.*?<hp:sz width="(\d+)".*?<hp:outMargin left="(\d+)" right="(\d+)"', xml, re.S)
+    table = sum(int(t.group(i)) for i in (1, 2, 3))
+    assert table - body <= 283, f"표가 여백 선 밖으로 {(table - body) / 283.46:.1f}mm 나감"
