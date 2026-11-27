@@ -15,7 +15,7 @@ from __future__ import annotations
 import re
 
 from .. import rules
-from ..model import NO, YES, Case
+from ..model import NO, YES, Case, day
 from .common import FormFiller, visual_len
 
 TEMPLATE = "form01_disaster_report.hwpx"
@@ -114,7 +114,7 @@ def build(case: Case) -> tuple[bytes, list[str]]:
             f.fill_gap(P2, row, 2, "가입자명:", ans.name)
             f.fill_gap(P2, row, 2, "생년월일:", rules.fmt_date(ans.birth) or None)
         if key == "car" and ans.answer == YES:
-            f.fill_gap(P2, row, 2, "만료일:", ans.detail)
+            f.fill_gap(P2, row, 2, "만료일:", rules.fmt_date(day(ans.detail)) or ans.detail)
 
     # ---------------- 2쪽: 4. 확인 사항
     _yes_no(f, P2, 10, 2, x.same_household.answer)

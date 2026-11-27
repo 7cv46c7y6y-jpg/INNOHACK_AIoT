@@ -7,7 +7,7 @@ from dataclasses import asdict, dataclass
 from . import calc
 from .model import EVIDENCE_ITEMS, INDIRECT_KEYS, NO, YES, Case
 
-F1, F2, F3 = "① 자연재난 피해신고서", "② 어업피해발생신고서", "③ 입식·출하·판매 신고서"
+F1, F2, F3 = "자연재난 피해신고서", "어업피해발생신고서", "입식·출하·판매 신고서"
 
 INDIRECT_LABELS = {
     "gas": "도시가스 사용 여부",
@@ -106,16 +106,16 @@ def check(case: Case) -> dict:
     if case.pre_disaster_reported != YES:
         warn("pre_disaster_reported",
              "재난 전에 입식·출하·판매 신고를 하지 않았다면 양식업 재난지원금 대상에서 빠질 수 있습니다 "
-             "(자연재난 규정 제9조 제4항). 지금 만드는 ③ 서식이 과거 신고 이력을 대신하지는 못합니다.")
+             "(자연재난 규정 제9조 제4항). 지금 만드는 입식·출하·판매 신고서가 과거 신고 이력을 대신하지는 못합니다.")
     deadline = calc.report_deadline(case)
     if deadline.due and d.report_date and d.report_date > deadline.due:
         warn("disaster.report_date",
              f"신고 예정일이 참고 기한({deadline.due.isoformat()})보다 늦습니다. 장기 여행 같은 부득이한 사유가 있었다면 "
              "그 사유가 끝난 날부터 10일 안에 신고할 수 있습니다 (제9조 제6항).")
-    warn("deadline.02", "② 어업피해발생신고서는 피해가 나면 지체 없이 읍·면·동에 내야 합니다. "
+    warn("deadline.02", "어업피해발생신고서는 피해가 나면 지체 없이 읍·면·동에 내야 합니다. "
                         "늦게 내면 피해조사 대상에서 빠질 수 있습니다.")
     if case.damage.amount_krw and not case.damage.amount_basis:
-        warn("damage.amount_basis", "피해액의 산정 근거가 없어 ②에는 피해액을 '미확인'으로 적습니다.")
+        warn("damage.amount_basis", "피해액의 산정 근거가 없어 어업피해발생신고서에는 피해액을 '미확인'으로 적습니다.")
     stocked_species = {r.species for r in case.stocking if r.species}
     if lic.species and stocked_species and lic.species not in stocked_species:
         warn("license.species", f"면허 정보의 품종({lic.species})이 입식 기록의 품종({', '.join(sorted(stocked_species))})과 다릅니다.")
@@ -187,8 +187,8 @@ def unknown_items(case: Case) -> dict[str, list[str]]:
 def manual_items() -> list[str]:
     """앱이 채우지 않고 사람이 직접 해야 하는 일."""
     return [
-        "① 주민등록번호와 재난지원금 지급통장(은행명·계좌번호·예금주)은 다운로드한 뒤 직접 적어 주세요.",
-        "① 서명 6곳: 2쪽 신고인 1곳, 3쪽 동의 5곳(동의하는 항목에만 서명).",
-        "② '(인)' 자리와 ③ '(서명 또는 인)' 자리는 직접 서명하거나 도장을 찍어 주세요.",
+        "자연재난 피해신고서의 주민등록번호와 재난지원금 지급통장(은행명·계좌번호·예금주)은 다운로드한 뒤 직접 적어 주세요.",
+        "자연재난 피해신고서 서명 6곳: 2쪽 신고인 1곳, 3쪽 동의 5곳(동의하는 항목에만 서명).",
+        "어업피해발생신고서의 '(인)' 자리와 입식·출하·판매 신고서의 '(서명 또는 인)' 자리는 직접 서명하거나 도장을 찍어 주세요.",
         "회색 칸(접수번호·접수일·처리기간, 피해물량 확정, 피해 구분, 피해 원인, 담당 공무원 확인 사항)은 담당 공무원이 현장 확인 뒤 적습니다.",
     ]

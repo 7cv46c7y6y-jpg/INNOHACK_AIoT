@@ -260,8 +260,6 @@ class Damage:
     amount_basis: str | None = None
     emergency: str | None = None       # 응급조치
     other: str | None = None           # 기타 사항
-    water_temp_c: float | None = None  # 어가가 잰 수온 (선택)
-    temp_measured_at: str | None = None
 
     @classmethod
     def from_dict(cls, data: Any) -> "Damage":
@@ -273,8 +271,6 @@ class Damage:
             amount_basis=s(_get(data, "amount_basis")),
             emergency=s(_get(data, "emergency")),
             other=s(_get(data, "other")),
-            water_temp_c=num(_get(data, "water_temp_c")),
-            temp_measured_at=s(_get(data, "temp_measured_at")),
         )
 
 
@@ -355,13 +351,13 @@ EVIDENCE = {
     "photos": {"label": "피해 사진", "detail": "생존·폐사·빈사 개체, 양식장 전경",
                "hint": "생존·폐사·빈사 개체의 아가미·체표, 양식장 전경", "folder": "01_피해사진", "badge": "조사 준비"},
     "sales_slips": {"label": "매매전표", "detail": "출하·판매",
-                    "hint": "출하·판매 때 받은 전표. ③ 신고서에 붙입니다.", "folder": "02_매매전표", "badge": "③ 첨부"},
+                    "hint": "출하·판매 때 받은 전표. 입식·출하·판매 신고서에 붙입니다.", "folder": "02_매매전표", "badge": "신고서 첨부"},
     "seed_docs": {"label": "수산종자 구입(생산) 관련 서류", "detail": "",
-                  "hint": "종자 구입 영수증, 생산 기록 등. ③ 신고서에 붙입니다.", "folder": "03_수산종자_구입서류", "badge": "③ 첨부"},
+                  "hint": "종자 구입 영수증, 생산 기록 등. 입식·출하·판매 신고서에 붙입니다.", "folder": "03_수산종자_구입서류", "badge": "신고서 첨부"},
     "license_copy": {"label": "면허(허가)증 사본", "detail": "",
                      "hint": "어업권·양식업 면허(허가)증", "folder": "04_면허증_사본", "badge": ""},
     "feed_receipts": {"label": "사료 구입 영수증", "detail": "",
-                      "hint": "③의 사료 구입 내역 근거", "folder": "05_사료_구입영수증", "badge": ""},
+                      "hint": "입식·출하·판매 신고서의 사료 구입 내역 근거", "folder": "05_사료_구입영수증", "badge": ""},
     "measurement_records": {"label": "현장 측정 기록", "detail": "수온·용존산소 등, 측정자·시각·위치·기기",
                             "hint": "수온·용존산소·pH·염분 기록 (측정자·시각·위치·기기 함께)", "folder": "06_현장측정기록", "badge": "조사 준비"},
     "emergency_records": {"label": "응급조치·사료 공급 기록", "detail": "",
@@ -390,9 +386,6 @@ class Case:
     damage: Damage = field(default_factory=Damage)
     form01: Form01Extra = field(default_factory=Form01Extra)
     evidence: dict[str, bool] = field(default_factory=dict)
-    farm_lat: float | None = None
-    farm_lng: float | None = None
-    share_on_map: bool = False
     overflow: list[str] = field(default_factory=list)   # 원본 행 수를 넘긴 표
 
     @property
@@ -418,7 +411,6 @@ class Case:
             overflow.append(f"사료 구입 기록은 서식에 {MAX_FEED_ROWS}줄까지만 들어갑니다 ({len(feed)}줄 입력).")
         reporter_same = flag(data.get("reporter_same"))
         evidence_data = data.get("evidence") or {}
-        farm = data.get("farm") or {}
         pre = s(data.get("pre_disaster_reported"))
         return cls(
             disaster=Disaster.from_dict(data.get("disaster")),
@@ -439,8 +431,5 @@ class Case:
             damage=Damage.from_dict(data.get("damage")),
             form01=Form01Extra.from_dict(data.get("form01")),
             evidence={k: bool(flag(evidence_data.get(k))) for k in EVIDENCE_ITEMS},
-            farm_lat=num(farm.get("lat")),
-            farm_lng=num(farm.get("lng")),
-            share_on_map=bool(flag(farm.get("share"))),
             overflow=overflow,
         )

@@ -7,12 +7,10 @@ import pytest
 from hwpx import HwpxDocument
 
 from app import create_app
-from app import farms as farms_mod
 
 
 @pytest.fixture
-def client(tmp_path, monkeypatch):
-    monkeypatch.setattr(farms_mod, "ADDED_PATH", tmp_path / "farms_added.json")
+def client():
     app = create_app()
     app.testing = True
     return app.test_client()
@@ -22,15 +20,21 @@ def test_pages(client):
     for url in ("/", "/apply", "/map", "/healthz"):
         assert client.get(url).status_code == 200
     home = client.get("/").get_data(as_text=True)
-    assert "피해보상 서류 작성" in home
-    assert "<div>홈</div>" in home              # 메뉴 이름
-    assert "mini-map" not in home              # 지도는 피해 지도 화면에만
-    assert "layout-navbar" not in home         # 위쪽 바 없음
-    assert "신고 순서" in home and "#how" not in home   # 신고 순서는 홈 카드로만 (메뉴에서 뺌)
+    assert "피해보상 서류 작성" in home and "아쿠아클레임" in home
+    assert 'id="layout-menu"' not in home       # 홈에는 왼쪽 메뉴 없음
+    assert "stat-total" not in home             # 가두리 피해 현황 카드 없음
+    assert "mini-map" not in home and "layout-navbar" not in home
+    # 신고 순서가 서식 3종 카드보다 위
+    assert home.index('<h5 class="card-title mb-3">신고 순서</h5>') < home.index('<h6 class="mb-1">입식·출하·판매 신고서</h6>')
+    assert not any(n in home for n in "①②③④")   # 화면에는 서식 번호 대신 이름
     page = client.get("/apply").get_data(as_text=True)
+    assert "<div>홈</div>" in page             # 작성 화면에는 왼쪽 메뉴 (이름은 '홈')
     for section in ("sec-disaster", "sec-farm", "sec-records", "sec-damage", "sec-extra", "sec-evidence", "sec-review"):
         assert section in page        # 한 페이지에 모든 단계
     assert 'data-evidence-files="sales_slips"' in page
+    assert "pick-map" not in page and "farm.share" not in page   # 가두리 위치 찍기 없음
+    for fid, kind in (("sale-sold_at", "date"), ("form01-indirect-car-detail", "date")):
+        assert f'type="{kind}" class="form-control" id="f-{fid}"' in page   # 날짜는 모두 달력
 
 
 def test_review_demo(client, demo_data):
@@ -72,20 +76,11 @@ def test_bad_input(client):
     assert client.post("/api/forms/zz", json={}).status_code == 404
 
 
-def test_farms_share_without_personal_info(client, demo_data):
-    before = len(client.get("/api/farms").get_json()["farms"])
-    res = client.post("/api/farms", json=demo_data)
-    assert res.status_code == 200
-    farm = res.get_json()["farm"]
-    assert farm["damage_rate"] == 13.33
-    assert not {"name", "address", "license", "victim"} & set(farm)
-    after = client.get("/api/farms").get_json()["farms"]
-    assert len(after) == before + 1
-
-
-def test_farms_needs_consent(client, demo_data):
-    demo_data["farm"]["share"] = False
-    assert client.post("/api/farms", json=demo_data).status_code == 400
+def test_farms_are_demo_only(client):
+    farms = client.get("/api/farms").get_json()["farms"]
+    assert len(farms) == 7 and all(f["source"] == "가상 데이터" for f in farms)
+    assert not any({"name", "address", "license", "victim"} & set(f) for f in farms)
+    assert client.post("/api/farms", json={}).status_code == 405   # 화면에서 지도에 올리는 기능 없음
 
 
 def _bundle(client, demo_data, files):

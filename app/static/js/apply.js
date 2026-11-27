@@ -1,4 +1,4 @@
-/* 피해보상 서류 작성 (한 페이지): 입력 모으기, 실시간 계산, 증빙 첨부, 검토, 내려받기, 지도 공유 */
+/* 피해보상 서류 작성 (한 페이지): 입력 모으기, 실시간 계산, 증빙 첨부, 검토, 내려받기 */
 (() => {
   "use strict";
   const { esc, fmt, toast } = window.AC;
@@ -8,7 +8,7 @@
 
   // 오류 위치(field) → 카드
   const FIELD_SECTION = [
-    [/^disaster\./, "sec-disaster"], [/^(victim|reporter|license|farm)\./, "sec-farm"], [/^relation/, "sec-farm"],
+    [/^disaster\./, "sec-disaster"], [/^(victim|reporter|license)\./, "sec-farm"], [/^relation/, "sec-farm"],
     [/^(stocking|outs|feed|rows|seed_source|sale|pre_disaster_reported)/, "sec-records"],
     [/^damage/, "sec-damage"], [/^form01\./, "sec-extra"], [/^evidence/, "sec-evidence"],
   ];
@@ -176,9 +176,6 @@
     const v = data.victim || {};
     const sub = (data.form01 || {}).mobile_subscriber || {};
     document.getElementById("sub-same").checked = !!v.name && sub.name === v.name;
-    const farm = data.farm || {};
-    if (farm.lat != null && farm.lng != null) setPick(Number(farm.lat), Number(farm.lng));
-    else clearPick();
     refreshUI();
   }
 
@@ -218,28 +215,6 @@
 
   form.addEventListener("input", refreshUI);
   form.addEventListener("change", (e) => { if (!e.target.closest("[data-evidence-files]")) refreshUI(); });
-
-  // ------------------------------------------------------------ 위치 찍기 지도
-  const pickMap = L.map("pick-map", { scrollWheelZoom: false }).setView([34.76, 128.40], 10);
-  window.AC.tileLayer().addTo(pickMap);
-  let pickMarker = null;
-  pickMap.on("click", (e) => setPick(e.latlng.lat, e.latlng.lng));
-
-  function setPick(lat, lng) {
-    document.getElementById("farm-lat").value = lat.toFixed(4);
-    document.getElementById("farm-lng").value = lng.toFixed(4);
-    document.getElementById("pick-coords").textContent = `위도 ${lat.toFixed(4)}, 경도 ${lng.toFixed(4)}`;
-    if (pickMarker) pickMarker.setLatLng([lat, lng]);
-    else pickMarker = L.marker([lat, lng]).addTo(pickMap);
-    pickMap.setView([lat, lng], Math.max(pickMap.getZoom(), 11));
-  }
-
-  function clearPick() {
-    document.getElementById("farm-lat").value = "";
-    document.getElementById("farm-lng").value = "";
-    document.getElementById("pick-coords").textContent = "아직 찍지 않았습니다.";
-    if (pickMarker) { pickMap.removeLayer(pickMarker); pickMarker = null; }
-  }
 
   // ------------------------------------------------------------ 버튼
   async function loadDemo() {
@@ -288,7 +263,6 @@
     const dl = e.target.closest("[data-download]");
     if (dl) download(dl.dataset.download, dl);
     if (e.target.closest("[data-bundle]")) downloadBundle(e.target.closest("[data-bundle]"));
-    if (e.target.closest("#share-map")) shareMap();
   });
 
   // 바로 가기: 보고 있는 카드 표시
@@ -331,7 +305,6 @@
     const v = out.validation;
     const g = out.guidance;
     const notes = out.notes || {};
-    const data = serialize();
     const parts = [];
     const stat = (label, value, tone) => `
       <div class="col-6 col-md">
@@ -344,8 +317,8 @@
       ${stat("재해 직전 사육량", s.stock_before != null ? fmt(s.stock_before) + "마리" : "-", "body")}
       ${stat("이번 피해량", s.dead_count != null ? fmt(s.dead_count) + "마리" : "-", "body")}
       ${stat("피해율 (참고값)", s.damage_rate != null ? s.damage_rate.toFixed(2) + "%" : "-", "primary")}
-      ${stat("①③ 신고 기한", s.deadline_01_03 || "재난 종료일 필요", "danger")}
-      ${stat("② 신고 기한", "지체 없이", "danger")}
+      ${stat("자연재난 피해신고서 기한", s.deadline_01_03 || "재난 종료일 필요", "danger")}
+      ${stat("어업피해발생신고서 기한", "지체 없이", "danger")}
     </div><p class="small text-muted">${esc(s.deadline_note)}</p>`);
 
     if (v.errors.length) {
@@ -381,20 +354,14 @@
         ${unknown.map(([f, items]) => `<p class="small mb-1"><b>${esc(f)}</b>: ${items.map(esc).join(", ")}</p>`).join("")}</div>`);
     }
 
-    parts.push(`<h6 class="mt-4">① 3쪽 동의 5가지 <small class="text-muted">(동의하는 항목에만 직접 서명)</small></h6>
+    parts.push(`<h6 class="mt-4">자연재난 피해신고서 3쪽 동의 5가지 <small class="text-muted">(동의하는 항목에만 직접 서명)</small></h6>
       <div class="table-responsive mb-3"><table class="table table-sm">
         <thead><tr><th>동의</th><th>뜻</th><th>동의하지 않으면</th></tr></thead>
         <tbody>${g.consents.map((c) => `<tr><td>${esc(c.name)}</td><td>${esc(c.meaning)}</td><td>${esc(c.if_not)}</td></tr>`).join("")}</tbody>
       </table></div>`);
 
-    parts.push(`<h6>④ 피해조사 준비</h6><p class="small">${esc(g.survey_note)}</p>${list(g.survey_prep.map(esc))}`);
+    parts.push(`<h6>양식생물 피해조사 준비</h6><p class="small">${esc(g.survey_note)}</p>${list(g.survey_prep.map(esc))}`);
 
-    const farm = data.farm || {};
-    if (farm.share && farm.lat && farm.lng) {
-      parts.push(`<div class="border rounded p-3 mt-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <div><b>피해 지도에 공유</b><div class="small text-muted">위치·품종·폐사율·수온만 올라갑니다. 이름·주소·면허번호는 올라가지 않습니다.</div></div>
-        <button type="button" class="btn btn-outline-primary" id="share-map" ${v.ok ? "" : "disabled"}><i class="bx bx-map-pin"></i> 지도에 올리기</button></div>`);
-    }
     return parts.join("");
   }
 
@@ -446,18 +413,6 @@
     } finally {
       button.disabled = false;
       button.innerHTML = original;
-    }
-  }
-
-  async function shareMap() {
-    try {
-      const res = await postJson("/api/farms");
-      const out = await res.json();
-      if (!res.ok) throw new Error(out.error || "지도에 올리지 못했습니다.");
-      toast("피해 지도에 올렸습니다.", "success");
-      window.location.href = `/map?focus=${encodeURIComponent(out.farm.id)}`;
-    } catch (err) {
-      toast(err.message, "danger");
     }
   }
 

@@ -86,9 +86,7 @@
     "amount_krw": "",
     "amount_basis": "",
     "emergency": "액화산소 공급, 사료 공급 중단, 차광막 설치",
-    "other": "",
-    "water_temp_c": "28.6",
-    "temp_measured_at": "2026-08-12 14:00"
+    "other": ""
   },
   "form01": {
     "housing": "소유자(실거주)",
@@ -111,7 +109,7 @@
       },
       "car": {
         "answer": "예",
-        "detail": "2027.03.31"
+        "detail": "2027-03-31"
       },
       "public_housing": {
         "answer": "아니오"
@@ -146,10 +144,5 @@
     "feed_receipts": true,
     "measurement_records": false,
     "emergency_records": true
-  },
-  "farm": {
-    "lat": 34.74,
-    "lng": 128.38,
-    "share": true
   }
 }

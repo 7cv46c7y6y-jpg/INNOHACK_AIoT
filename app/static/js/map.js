@@ -5,23 +5,12 @@
 
   const map = L.map("farm-map").setView([34.76, 128.40], 10);
   tileLayer().addTo(map);
-  const focus = new URLSearchParams(window.location.search).get("focus");
 
   fetch("/api/farms")
     .then((res) => res.json())
     .then(({ farms }) => {
-      let focused = null;
-      const markers = farms.map((f) => {
-        const m = farmMarker(f).addTo(map);
-        if (focus && f.id === focus) focused = m;
-        return m;
-      });
-      if (focused) {
-        map.setView(focused.getLatLng(), 12);
-        focused.openPopup();
-      } else if (markers.length) {
-        map.fitBounds(L.featureGroup(markers).getBounds().pad(0.2));
-      }
+      const markers = farms.map((f) => farmMarker(f).addTo(map));
+      if (markers.length) map.fitBounds(L.featureGroup(markers).getBounds().pad(0.2));
       const s = summarize(farms);
       document.getElementById("map-summary").innerHTML = `
         <p class="mb-2">표시된 가두리 <b>${s.total}</b>곳</p>

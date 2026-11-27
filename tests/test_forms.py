@@ -79,6 +79,7 @@ def test_f01_values(demo):
     assert "(품종: 조피볼락)" in t[(0, 15, 4)]
     assert "본인[√]" in t[(1, 13, 0)]
     assert "2026년" in t[(1, 13, 0)]
+    assert "2027.03.31" in t[(1, 3, 2)]        # 자동차 검사 유효기간 만료일 (달력 값 2027-03-31)
 
 
 def test_f02_values(demo):
@@ -99,6 +100,7 @@ def test_f03_values(demo):
     assert t[(0, 19, 8)] == "10,000"           # 출하·폐사 계 (7,000 + 3,000)
     assert t[(0, 19, 18)] == "90,000"          # 잔량 = 재해 직전 사육량
     assert "제 2020-0123 호" in t[(0, 9, 1)]
+    assert "2026.06.20" in t[(0, 24, 3)]       # 판매일시 (달력 값 2026-06-20)
 
 
 def test_bundle_has_three_files(demo):

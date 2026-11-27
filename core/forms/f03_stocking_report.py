@@ -11,7 +11,7 @@
 from __future__ import annotations
 
 from .. import calc, rules
-from ..model import MAX_FEED_ROWS, MAX_OUT_ROWS, MAX_STOCKING_ROWS, Case
+from ..model import MAX_FEED_ROWS, MAX_OUT_ROWS, MAX_STOCKING_ROWS, Case, day
 from .common import FormFiller
 
 TEMPLATE = "form03_stocking_report.hwpx"
@@ -119,7 +119,7 @@ def build(case: Case) -> tuple[bytes, list[str]]:
         cell(OUT_TOTAL_ROW, OUT_COLS["amount"], rules.fmt_num(sum(amounts)) if amounts else "", "출하 계(금액)")
         if remaining and remaining[len(outs) - 1] is not None:
             cell(OUT_TOTAL_ROW, OUT_COLS["remain"], rules.fmt_int(remaining[len(outs) - 1]), "잔량 계")
-    f.append_fit(T, 24, 3, case.sold_at, min_pt=min_pt)
+    f.append_fit(T, 24, 3, rules.fmt_date(day(case.sold_at)) or case.sold_at, min_pt=min_pt)
     f.append_fit(T, 24, 11, case.buyer_contact, min_pt=min_pt)
     f.append_fit(T, 25, 3, case.buyer, min_pt=min_pt)
 

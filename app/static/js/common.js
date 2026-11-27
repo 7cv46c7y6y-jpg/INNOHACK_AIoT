@@ -37,7 +37,7 @@ window.AC = (() => {
       폐사율 <b>${f.damage_rate != null ? Number(f.damage_rate).toFixed(2) + "%" : "-"}</b><br>
       수온 ${f.water_temp_c != null ? esc(f.water_temp_c) + "℃" : "미입력"}${f.measured_at ? ` (${esc(f.measured_at)})` : ""}<br>
       기록일 ${esc(f.recorded_on || "-")}<br>
-      <small class="text-muted">${esc(f.source)} · 어가 자체 입력·미확인</small>`);
+      <small class="text-muted">${esc(f.source)} · 공적 확인 자료 아님</small>`);
   }
 
   function summarize(farms) {

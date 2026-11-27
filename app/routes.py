@@ -1,14 +1,13 @@
 """화면과 API.
 
-- GET  /                 홈 (피해보상 서류 작성 버튼, 가두리 피해 현황, 서식 3종 기한, 신고 순서)
+- GET  /                 홈 (왼쪽 메뉴 없음: 피해보상 서류 작성 버튼, 신고 순서, 서식 3종 기한)
 - GET  /apply            피해보상 서류 작성 (한 페이지: 재해·어가·면허·사육 기록·피해·추가 질문·증빙 첨부·검토)
 - GET  /map              가두리 피해 지도
 - GET  /api/demo         시연 사례
 - POST /api/review       계산·검증·안내 (입력 JSON)
 - POST /api/forms/<id>   서식 HWPX 내려받기 (f01, f02, f03, all=zip). 생성 파일은 서버에 저장하지 않는다.
 - POST /api/bundle       제출 묶음 zip (multipart: case=JSON, evidence.<항목>=파일들). 첨부 파일도 저장하지 않는다.
-- GET  /api/farms        지도 데이터
-- POST /api/farms        지도에 올리기 (개인 식별 정보는 저장하지 않음)
+- GET  /api/farms        지도 데이터 (시연용 가상 어가)
 """
 
 from __future__ import annotations
@@ -58,7 +57,7 @@ def _http_error(err: HTTPException):
 # ------------------------------------------------------------------ 화면
 @bp.get("/")
 def home():
-    return render_template("home.html")
+    return render_template("home.html", hide_menu=True)
 
 
 @bp.get("/apply")
@@ -161,14 +160,3 @@ def bundle():
 def list_farms():
     return jsonify(farms=farms.all_farms())
 
-
-@bp.post("/api/farms")
-def add_farm():
-    case = _case()
-    if not case.share_on_map:
-        raise BadInput("지도에 올리려면 공유에 동의해 주세요.")
-    try:
-        point = farms.point_from_case(case)
-    except ValueError as err:
-        raise BadInput(str(err)) from err
-    return jsonify(farm=farms.add(point))
