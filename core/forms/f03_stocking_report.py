@@ -58,27 +58,27 @@ def build(case: Case) -> tuple[bytes, list[str]]:
     # 신고인
     f.append(T, 3, 1, filer.name, p=0)
     f.append(T, 3, 1, filer.name_hanja, p=1)
-    f.append(T, 3, 9, rules.fmt_date(filer.birth) or None)
-    f.append(T, 4, 1, filer.address)
+    f.append_fit(T, 3, 9, rules.fmt_date(filer.birth) or None, min_pt=min_pt)
+    f.append_fit(T, 4, 1, filer.address, min_pt=min_pt)
     f.fill_gap(T, 4, 10, "(휴대폰:", filer.mobile, p=0)
     f.fill_gap(T, 4, 10, "(전화번호:", filer.phone, p=1)
     # 어업권자·양식업권자(행사자) = 피해자
     f.append(T, 6, 1, owner.name, p=0)
     f.append(T, 6, 1, owner.name_hanja, p=1)
-    f.append(T, 6, 9, rules.fmt_date(owner.birth) or None)
+    f.append_fit(T, 6, 9, rules.fmt_date(owner.birth) or None, min_pt=min_pt)
     f.append(T, 7, 1, owner.address, p=0)
     f.fill_gap(T, 7, 1, "(전화번호:", owner.phone or owner.mobile, p=1)
-    f.append(T, 8, 0, lic.fishery_type)
-    f.append(T, 8, 9, lic.method)
+    f.append_fit(T, 8, 0, lic.fishery_type, min_pt=min_pt)
+    f.append_fit(T, 8, 9, lic.method, min_pt=min_pt)
     # 어업권·양식업권 현황
     f.fill_gap(T, 9, 1, "제", _license_no(lic.number), p=1)
     if lic.period_from or lic.period_to:
         period = f"{rules.fmt_date(lic.period_from)} ~ {rules.fmt_date(lic.period_to)}".strip()
-        f.append(T, 9, 9, period)
+        f.append_fit(T, 9, 9, period, min_pt=min_pt)
     if lic.area_ha is not None:
         para = f.para(T, 10, 1, 1)
         para.insert_text(0, f"{rules.fmt_num(lic.area_ha)}ha  ")
-    f.append(T, 10, 9, lic.location)
+    f.append_fit(T, 10, 9, lic.location, min_pt=min_pt)
 
     # 입식 표
     rows = case.stocking[:MAX_STOCKING_ROWS]
@@ -93,8 +93,8 @@ def build(case: Case) -> tuple[bytes, list[str]]:
         kg = [r.weight_kg for r in rows if r.weight_kg is not None]
         cell(STOCK_TOTAL_ROW, STOCK_COLS["kg"], rules.fmt_num(sum(kg)) if kg else "", "입식 계(kg)")
         cell(STOCK_TOTAL_ROW, STOCK_COLS["count"], rules.fmt_int(sum(r.count or 0 for r in rows)), "입식 계(마리)")
-    f.append(T, 17, 3, case.seed_source_name)
-    f.append(T, 17, 11, case.seed_source_phone)
+    f.append_fit(T, 17, 3, case.seed_source_name, min_pt=min_pt)
+    f.append_fit(T, 17, 11, case.seed_source_phone, min_pt=min_pt)
 
     # 출하(판매) 또는 폐사등 표 (재해 전 기록)
     outs = case.outs[:MAX_OUT_ROWS]
@@ -119,9 +119,9 @@ def build(case: Case) -> tuple[bytes, list[str]]:
         cell(OUT_TOTAL_ROW, OUT_COLS["amount"], rules.fmt_num(sum(amounts)) if amounts else "", "출하 계(금액)")
         if remaining and remaining[len(outs) - 1] is not None:
             cell(OUT_TOTAL_ROW, OUT_COLS["remain"], rules.fmt_int(remaining[len(outs) - 1]), "잔량 계")
-    f.append(T, 24, 3, case.sold_at)
-    f.append(T, 24, 11, case.buyer_contact)
-    f.append(T, 25, 3, case.buyer)
+    f.append_fit(T, 24, 3, case.sold_at, min_pt=min_pt)
+    f.append_fit(T, 24, 11, case.buyer_contact, min_pt=min_pt)
+    f.append_fit(T, 25, 3, case.buyer, min_pt=min_pt)
 
     # 사료 구입(확보)
     for r, row in zip(FEED_ROWS, case.feed[:MAX_FEED_ROWS]):

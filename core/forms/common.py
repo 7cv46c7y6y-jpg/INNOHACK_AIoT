@@ -62,6 +62,18 @@ class FormFiller:
         else:
             para.insert_text(len(text), sep + value)
 
+    def append_fit(self, t: int, r: int, c: int, value: str | None, *, min_pt: float = 6.0, label: str = "") -> None:
+        """문단이 하나뿐인 이름표 칸('주소', '어장 위치' 등)에 값을 붙이고, 칸에 맞게 글자를 줄인다.
+        문단이 여러 개인 칸은 append와 같다."""
+        if not value:
+            return
+        cell = self.cell(t, r, c)
+        if len(cell.paragraphs) != 1 or "\n" in cell.text:
+            self.append(t, r, c, value)
+            return
+        name = cell.text.rstrip()
+        self.set_cell(t, r, c, f"{name} {value}", min_pt=min_pt, label=label or name)
+
     def fill_gap(self, t: int, r: int, c: int, after: str, value: str | None, p: int = 0,
                  occurrence: int = 0) -> None:
         """`after` 바로 뒤의 공백 묶음을 값으로 바꾼다. 남는 너비는 공백으로 채워 배치를 유지한다."""
