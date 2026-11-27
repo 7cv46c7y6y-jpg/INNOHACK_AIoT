@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block title %}피해 지도 · 아쿠아클레임{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css') }}">{% endblock %}
+
+{% block content %}
+<div class="alert alert-primary small" role="alert">
+  지도의 가두리는 모두 <b>시연용 가상 데이터</b>입니다. 공적으로 확인된 수온·피해 정보가 아닙니다.
+</div>
+<div class="row">
+  <div class="col-lg-9 mb-4">
+    <div class="card">
+      <div class="card-body p-2">
+        <div id="farm-map" class="map-box" style="height: 600px" role="region" aria-label="가두리 피해 지도"></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 mb-4">
+    <div class="card mb-4">
+      <div class="card-header pb-2"><h6 class="m-0">폐사율 구간</h6></div>
+      <div class="card-body">
+        <div class="d-flex flex-column gap-2 small">
+          <span><i class="dot dot-low"></i> 10% 미만</span>
+          <span><i class="dot dot-mid"></i> 10~30%</span>
+          <span><i class="dot dot-high"></i> 30% 이상</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header pb-2"><h6 class="m-0">요약</h6></div>
+      <div class="card-body small" id="map-summary">불러오는 중…</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js') }}"></script>
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+{% endblock %}

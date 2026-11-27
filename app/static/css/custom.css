@@ -1,0 +1,79 @@
+/* Sneat 위에 얹는 아쿠아클레임 스타일: 한글 글꼴, 작성 화면 카드, 지도 */
+:root {
+  --ac-font: "Public Sans", "Pretendard", "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --bs-body-font-family: var(--ac-font);
+}
+body, .menu, .menu-inner, .app-brand-text, .btn, .form-control, .form-select, .badge, .tooltip, .popover,
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: var(--ac-font);
+}
+body { word-break: keep-all; }
+
+/* Sneat demo.css 에서 필요한 것만 */
+.menu .app-brand.demo { height: 64px; margin-top: 12px; }
+
+/* Sneat 는 라벨을 대문자로 바꾼다: 단위(cm, kg, ha)가 CM, KG 로 보이지 않게 */
+.form-label, .col-form-label { text-transform: none; }
+
+/* 브랜드 */
+.brand-mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 10px;
+  background: #696cff; color: #fff; font-size: 1.35rem;
+}
+.app-brand-text.demo { font-size: 1.35rem; letter-spacing: -0.5px; text-transform: none; }
+.home-brand { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.5px; color: #566a7f; }
+.brand-mark-sm { width: 28px; height: 28px; border-radius: 8px; font-size: 1.1rem; }
+
+/* 작성 화면 카드 */
+.card-header .sec-no {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; margin-right: 8px; border-radius: 8px;
+  background: rgba(105, 108, 255, 0.16); color: #696cff; font-size: 0.95rem; font-weight: 700;
+}
+#case-form > .card, #sec-review { scroll-margin-top: 24px; }
+.choice-group .btn { margin-bottom: 4px; }
+.rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.row-card { border: 1px dashed #d9dee3; border-radius: 0.5rem; padding: 10px 12px; background: #fbfbff; }
+.row-card .form-label { font-size: 0.72rem; margin-bottom: 2px; }
+.evidence-item { border: 1px solid #e7e9ed; border-radius: 0.5rem; padding: 14px 16px; margin-bottom: 12px; transition: border-color 0.15s, background-color 0.15s; }
+.evidence-item.dragover { border: 1px dashed #696cff; background: rgba(105, 108, 255, 0.06); }
+.file-list { list-style: none; padding-left: 0; margin-top: 8px; }
+.file-list li { padding: 2px 0; }
+
+/* 오른쪽 요약 */
+@media (min-width: 1200px) {
+  .sticky-summary { position: sticky; top: 24px; }
+}
+#section-nav .list-group-item.active { background: rgba(105, 108, 255, 0.12); color: #696cff; border-color: transparent; font-weight: 600; }
+
+/* 오류 위치로 이동할 때 깜빡임 */
+.flash { animation: ac-flash 1.5s ease; }
+@keyframes ac-flash { 0%, 60% { box-shadow: 0 0 0 0.25rem rgba(255, 62, 29, 0.35); } 100% { box-shadow: none; } }
+
+/* 지도 */
+.map-box { width: 100%; border-radius: 0.5rem; border: 1px solid #e7e9ed; z-index: 0; }
+.dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -1px; margin-right: 4px; }
+.dot-low { background: #71dd37; }
+.dot-mid { background: #ffab00; }
+.dot-high { background: #ff3e1d; }
+.leaflet-container { font-family: var(--ac-font); }
+
+/* 홈: 카드가 칸 높이를 채우게 (열 안에서 카드, 카드 안에서 작은 칸이 늘어남) */
+.home-row > [class*="col-"], .step-grid > [class*="col-"] { display: flex; }
+.home-row > [class*="col-"] > .card { flex: 1 1 auto; }
+.hero-img { height: clamp(120px, 20vh, 190px); width: auto; }
+
+/* 넓은 화면: 세 줄이 화면 높이를 나눠 채워서 아래가 비지 않게 (첫 줄이 더 많이 늘어남).
+   내용이 화면보다 길면 늘어나지 않고 평소처럼 스크롤된다. */
+@media (min-width: 1200px) {
+  .home-container { display: flex; flex-direction: column; }
+  .home-fill { flex: 1 1 auto; display: flex; flex-direction: column; }
+  .home-row { flex: 1 1 auto; }
+  .home-row-hero { flex-grow: 2; }
+}
+
+/* 홈: 신고 순서 */
+.step { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; padding: 12px 16px; border: 1px solid #e7e9ed; border-radius: 0.5rem; }
+.step .badge { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; padding: 0; }
+

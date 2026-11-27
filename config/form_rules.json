@@ -1,0 +1,28 @@
+{
+  "_설명": "서식 기재 규칙 기본값. 공식 작성 예시가 없어 정한 가정이며, 지자체 확인 결과에 따라 이 파일만 고치면 된다.",
+  "common": {
+    "check_mark": "√",
+    "unknown_text": "미확인",
+    "date_format": "{y}.{m:02d}.{d:02d}"
+  },
+  "form01": {
+    "_설명": "시설별 칸은 폭이 약 2.4cm라 '품종 + 마리 수'는 6pt로 줄여도 한 줄에 들어가지 않는다. 그래서 피해물량에는 마리 수만 적고, 품종은 넓은 '피해 발생 위치' 칸에 함께 적는다.",
+    "facility_name": "해상가두리",
+    "area_format": "{area}ha",
+    "damage_qty_format": "{count}마리",
+    "location_format": "{location} (품종: {species})",
+    "min_font_pt": 6.0
+  },
+  "form02": {
+    "cause_suffix": " (추정)",
+    "situation_format": "피해량: {species} {count}마리 (재해 직전 사육량 {stock}마리 기준 피해율 {rate}%, 참고값)",
+    "amount_format": "피해액: {amount}원 (산정 근거: {basis})",
+    "amount_unknown": "피해액: 미확인",
+    "min_font_pt": 7.0
+  },
+  "form03": {
+    "dead_row_suffix": "(폐사)",
+    "size_format": "{cm}cm·{g}g",
+    "min_font_pt": 6.0
+  }
+}

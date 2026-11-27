@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+{% block title %}아쿠아클레임{% endblock %}
+{% block container_class %}home-container pt-3 pb-3{% endblock %}
+
+{% block content %}
+<!-- 넓은 화면에서는 세 줄이 화면 높이를 나눠 채운다 (custom.css 의 .home-fill) -->
+<div class="home-fill">
+  <!-- 첫 카드: 서비스 이름과 작성 버튼 -->
+  <div class="row home-row home-row-hero">
+    <div class="col-12 mb-3">
+      <div class="card">
+        <div class="d-flex align-items-end row flex-grow-1">
+          <div class="col-md-7 align-self-center">
+            <div class="card-body">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="brand-mark brand-mark-sm"><i class="bx bx-water"></i></span>
+                <span class="home-brand">아쿠아클레임</span>
+              </div>
+              <h5 class="card-title text-primary mb-1">양식 재해 피해, 서류는 한 번만 입력하세요</h5>
+              <p class="mb-3">재해 정보와 사육 기록을 한 번 입력하면 어업인이 직접 써야 하는 공식 서식 3종의 초안(HWPX)과
+                증빙을 묶은 <b>제출 묶음</b>을 만들어 드립니다. 빠진 것과 신고 기한도 알려 드립니다.</p>
+              <a href="{{ url_for('main.apply') }}" class="btn btn-primary btn-lg">
+                <i class="bx bx-edit-alt me-1"></i> 피해보상 서류 작성
+              </a>
+            </div>
+          </div>
+          <div class="col-md-5 text-center">
+            <div class="card-body pb-0 px-0 px-md-4">
+              <img class="hero-img" src="{{ url_for('static', filename='vendor/sneat/img/man-with-laptop-light.png') }}" height="130" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 신고 순서 -->
+  <div class="row home-row">
+    <div class="col-12 mb-3">
+      <div class="card">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title mb-3">신고 순서</h5>
+          <div class="row g-3 flex-grow-1 step-grid">
+            {% for no, tone, title, text in [
+              (1, "danger", "피해 즉시", "어업피해발생신고서를 읍·면·동에 냅니다."),
+              (2, "primary", "재난 종료 후 10일 안", "자연재난 피해신고서와 입식·출하·판매 신고서를 매매전표·수산종자 구입 서류와 함께 시·군·구에 냅니다."),
+              (3, "info", "피해정밀조사", "조사반이 양식생물 피해조사 서식을 씁니다. 수온 기록·사진·사료 기록을 준비합니다."),
+              (4, "success", "지원 확정", "담당 공무원이 피해를 확인하고 재난지원금 지급 대상을 확정합니다."),
+            ] %}
+            <div class="col-md-6 col-xl-3">
+              <div class="step">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <span class="badge rounded-pill bg-{{ tone }}">{{ no }}</span>
+                  <h6 class="mb-0">{{ title }}</h6>
+                </div>
+                <p class="small mb-0">{{ text }}</p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 서식 3종 -->
+  <div class="row home-row">
+    {% for title, tone, icon, due, who, text in [
+      ("어업피해발생신고서", "danger", "bx-bell", "지체 없이", "피해 어업인 작성",
+       "피해가 나면 바로 피해 어장을 관할하는 읍·면·동에 냅니다. 늦게 내면 피해조사 대상에서 빠질 수 있습니다."),
+      ("자연재난 피해신고서", "primary", "bx-file", "재난 종료 후 10일 이내", "신고인 작성",
+       "재난지원금 신청서입니다. 시·군·구(읍·면사무소, 동 주민센터도 가능)에 입식·출하·판매 신고서와 함께 냅니다."),
+      ("입식·출하·판매 신고서", "warning", "bx-receipt", "재난 전 신고 필수", "신고인·어업권자 작성",
+       "평소 입식 후 20일, 출하·판매는 다음 달 5일까지 신고합니다. 재난 전에 신고한 경우에만 재난지원금이 나옵니다."),
+    ] %}
+    <div class="col-md-4 mb-3 mb-md-0">
+      <div class="card">
+        <div class="card-body d-flex flex-column justify-content-center">
+          <div class="d-flex align-items-center gap-3 mb-2">
+            <div class="avatar flex-shrink-0"><span class="avatar-initial rounded bg-label-{{ tone }}"><i class="bx {{ icon }}"></i></span></div>
+            <div>
+              <h6 class="mb-1">{{ title }}</h6>
+              <span class="badge bg-label-{{ tone }}">{{ due }}</span> <small class="text-muted ms-1">{{ who }}</small>
+            </div>
+          </div>
+          <p class="mb-0 small">{{ text }}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

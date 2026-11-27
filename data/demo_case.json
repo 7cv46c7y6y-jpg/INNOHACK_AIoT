@@ -1,0 +1,148 @@
+{
+  "_설명": "시연용 가상 사례. 이름·주소·번호는 모두 가상이다.",
+  "disaster": {
+    "kind": "고수온",
+    "damage_start": "2026-08-10",
+    "damage_end": "2026-08-20",
+    "disaster_end": "2026-08-25",
+    "report_date": "2026-08-27"
+  },
+  "victim": {
+    "name": "김바다",
+    "name_hanja": "",
+    "birth": "1968-04-12",
+    "address": "경상남도 통영시 산양읍 가상리 123 (가상)",
+    "mobile": "010-0000-1234",
+    "phone": "055-000-1234"
+  },
+  "reporter_same": true,
+  "reporter": {},
+  "relation": "본인",
+  "license": {
+    "number": "제2020-0123호",
+    "period_from": "2020-01-01",
+    "period_to": "2029-12-31",
+    "area_ha": "2.0",
+    "fishery_type": "어류등양식업",
+    "method": "해상가두리식",
+    "location": "경남 통영시 산양읍 가상리 지선 해상",
+    "species": "조피볼락"
+  },
+  "stocking": [
+    {
+      "species": "조피볼락",
+      "size_cm": "8",
+      "size_g": "15",
+      "weight_kg": "1500",
+      "count": "100000",
+      "place": "가상리 지선 가두리",
+      "date": "2025-04-15"
+    }
+  ],
+  "seed_source": {
+    "name": "가상수산종묘",
+    "phone": "055-000-5678"
+  },
+  "outs": [
+    {
+      "kind": "출하",
+      "species": "조피볼락",
+      "stock_year": "2025",
+      "size_cm": "25",
+      "weight_kg": "2100",
+      "count": "7000",
+      "unit_price": "6500",
+      "amount_kwon": "45500"
+    },
+    {
+      "kind": "폐사",
+      "species": "조피볼락",
+      "stock_year": "2025",
+      "size_cm": "20",
+      "weight_kg": "450",
+      "count": "3000"
+    }
+  ],
+  "sale": {
+    "sold_at": "2026-06-20",
+    "contact": "055-000-9012",
+    "buyer": "가상활어유통"
+  },
+  "feed": [
+    {
+      "date": "2026-07-01",
+      "supplier": "가상사료",
+      "phone": "055-000-3456",
+      "name": "배합사료(EP)",
+      "qty": "40포",
+      "unit_price": "32000"
+    }
+  ],
+  "pre_disaster_reported": "예",
+  "damage": {
+    "dead_count": "12000",
+    "dead_weight_kg": "3600",
+    "cause_note": "고수온",
+    "amount_krw": "",
+    "amount_basis": "",
+    "emergency": "액화산소 공급, 사료 공급 중단, 차광막 설치",
+    "other": ""
+  },
+  "form01": {
+    "housing": "소유자(실거주)",
+    "family_count": "3",
+    "high_schools": [],
+    "carrier": "SKT",
+    "mobile_subscriber": {
+      "name": "김바다",
+      "birth": "1968-04-12"
+    },
+    "landline_subscriber": {
+      "name": "김바다",
+      "birth": "1968-04-12"
+    },
+    "loan_request": true,
+    "public_property": null,
+    "indirect": {
+      "gas": {
+        "answer": "아니오"
+      },
+      "car": {
+        "answer": "예",
+        "detail": "2027-03-31"
+      },
+      "public_housing": {
+        "answer": "아니오"
+      },
+      "crisis_family": {
+        "answer": "아니오"
+      },
+      "health_arrears": {
+        "answer": "아니오"
+      },
+      "fine_deferral": {
+        "answer": "아니오"
+      },
+      "inheritance_loss": {
+        "answer": "아니오"
+      }
+    },
+    "same_household": {
+      "answer": "아니오"
+    },
+    "other_region": {
+      "answer": "아니오"
+    },
+    "storm_insurance": "아니오",
+    "storm_insurance_intent": "아니오"
+  },
+  "evidence": {
+    "photos": true,
+    "sales_slips": true,
+    "seed_docs": true,
+    "license_copy": true,
+    "feed_receipts": true,
+    "measurement_records": false,
+    "emergency_records": true
+  }
+}
