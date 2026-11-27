@@ -26,6 +26,7 @@ def test_pages(client):
     assert "<div>홈</div>" in home              # 메뉴 이름
     assert "mini-map" not in home              # 지도는 피해 지도 화면에만
     assert "layout-navbar" not in home         # 위쪽 바 없음
+    assert "신고 순서" in home and "#how" not in home   # 신고 순서는 홈 카드로만 (메뉴에서 뺌)
     page = client.get("/apply").get_data(as_text=True)
     for section in ("sec-disaster", "sec-farm", "sec-records", "sec-damage", "sec-extra", "sec-evidence", "sec-review"):
         assert section in page        # 한 페이지에 모든 단계

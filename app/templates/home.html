@@ -6,7 +6,7 @@
   <!-- 첫 카드: 작성 버튼 -->
   <div class="col-lg-8 mb-4">
     <div class="card h-100">
-      <div class="d-flex align-items-end row">
+      <div class="d-flex align-items-end row h-100">
         <div class="col-sm-7">
           <div class="card-body">
             <h5 class="card-title text-primary mb-2">양식 재해 피해, 서류는 한 번만 입력하세요</h5>
@@ -17,42 +17,44 @@
             </a>
           </div>
         </div>
-        <div class="col-sm-5 text-center text-sm-left">
+        <div class="col-sm-5 text-center">
           <div class="card-body pb-0 px-0 px-md-4">
-            <img src="{{ url_for('static', filename='vendor/sneat/img/man-with-laptop-light.png') }}" height="150" alt="">
+            <img src="{{ url_for('static', filename='vendor/sneat/img/man-with-laptop-light.png') }}" height="130" alt="">
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 피해 현황 요약 -->
+  <!-- 가두리 피해 현황 -->
   <div class="col-lg-4 mb-4">
     <div class="card h-100">
-      <div class="card-header d-flex align-items-center justify-content-between pb-0">
-        <h5 class="card-title m-0">가두리 피해 현황</h5>
-        <a href="{{ url_for('main.map_page') }}" class="small">지도 보기</a>
-      </div>
-      <div class="card-body pt-3">
-        <ul class="p-0 m-0 stat-list">
-          <li class="d-flex mb-3">
-            <div class="avatar flex-shrink-0 me-3"><span class="avatar-initial rounded bg-label-primary"><i class="bx bx-map-pin"></i></span></div>
-            <div class="d-flex w-100 justify-content-between align-items-center"><span>표시된 가두리</span><b id="stat-total">-</b></div>
-          </li>
-          <li class="d-flex mb-3">
-            <div class="avatar flex-shrink-0 me-3"><span class="avatar-initial rounded bg-label-danger"><i class="bx bx-error"></i></span></div>
-            <div class="d-flex w-100 justify-content-between align-items-center"><span>폐사율 30% 이상</span><b id="stat-high">-</b></div>
-          </li>
-          <li class="d-flex mb-3">
-            <div class="avatar flex-shrink-0 me-3"><span class="avatar-initial rounded bg-label-warning"><i class="bx bx-error-alt"></i></span></div>
-            <div class="d-flex w-100 justify-content-between align-items-center"><span>폐사율 10~30%</span><b id="stat-mid">-</b></div>
-          </li>
-          <li class="d-flex">
-            <div class="avatar flex-shrink-0 me-3"><span class="avatar-initial rounded bg-label-info"><i class="bx bx-water"></i></span></div>
-            <div class="d-flex w-100 justify-content-between align-items-center"><span>입력된 수온 평균</span><b id="stat-temp">-</b></div>
-          </li>
-        </ul>
-        <p class="small text-muted mt-3 mb-0">어가 자체 입력·미확인 자료입니다.</p>
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <h5 class="card-title mb-0">가두리 피해 현황</h5>
+            <small class="text-muted">어가 자체 입력·미확인 자료입니다.</small>
+          </div>
+          <a href="{{ url_for('main.map_page') }}" class="small text-nowrap">지도 보기</a>
+        </div>
+        <div class="row g-2">
+          {% for stat_id, label, icon, tone in [
+            ("stat-total", "표시된 가두리", "bx-map-pin", "primary"),
+            ("stat-high", "폐사율 30% 이상", "bx-error", "danger"),
+            ("stat-mid", "폐사율 10~30%", "bx-error-alt", "warning"),
+            ("stat-temp", "입력된 수온 평균", "bx-water", "info"),
+          ] %}
+          <div class="col-6">
+            <div class="stat-tile">
+              <span class="avatar avatar-sm flex-shrink-0"><span class="avatar-initial rounded bg-label-{{ tone }}"><i class="bx {{ icon }}"></i></span></span>
+              <div class="stat-text">
+                <div class="small text-muted">{{ label }}</div>
+                <b id="{{ stat_id }}">-</b>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
       </div>
     </div>
   </div>
@@ -63,11 +65,13 @@
   <div class="col-md-4 mb-4">
     <div class="card h-100">
       <div class="card-body">
-        <div class="d-flex align-items-center mb-3">
-          <div class="avatar me-3"><span class="avatar-initial rounded bg-label-danger"><i class="bx bx-bell"></i></span></div>
-          <div><h6 class="mb-0">② 어업피해발생신고서</h6><small class="text-muted">피해 어업인 작성</small></div>
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="avatar flex-shrink-0"><span class="avatar-initial rounded bg-label-danger"><i class="bx bx-bell"></i></span></div>
+          <div>
+            <h6 class="mb-1">② 어업피해발생신고서</h6>
+            <span class="badge bg-label-danger">지체 없이</span> <small class="text-muted ms-1">피해 어업인 작성</small>
+          </div>
         </div>
-        <span class="badge bg-label-danger mb-2">지체 없이</span>
         <p class="mb-0 small">피해가 나면 바로 피해 어장을 관할하는 읍·면·동에 냅니다. 늦게 내면 피해조사 대상에서 빠질 수 있습니다.</p>
       </div>
     </div>
@@ -75,11 +79,13 @@
   <div class="col-md-4 mb-4">
     <div class="card h-100">
       <div class="card-body">
-        <div class="d-flex align-items-center mb-3">
-          <div class="avatar me-3"><span class="avatar-initial rounded bg-label-primary"><i class="bx bx-file"></i></span></div>
-          <div><h6 class="mb-0">① 자연재난 피해신고서</h6><small class="text-muted">신고인 작성 · 회색 칸은 공무원</small></div>
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="avatar flex-shrink-0"><span class="avatar-initial rounded bg-label-primary"><i class="bx bx-file"></i></span></div>
+          <div>
+            <h6 class="mb-1">① 자연재난 피해신고서</h6>
+            <span class="badge bg-label-primary">재난 종료 후 10일 이내</span> <small class="text-muted ms-1">신고인 작성</small>
+          </div>
         </div>
-        <span class="badge bg-label-primary mb-2">재난 종료 후 10일 이내</span>
         <p class="mb-0 small">재난지원금 신청서입니다. 시·군·구(읍·면사무소, 동 주민센터도 가능)에 ③과 함께 냅니다.</p>
       </div>
     </div>
@@ -87,11 +93,13 @@
   <div class="col-md-4 mb-4">
     <div class="card h-100">
       <div class="card-body">
-        <div class="d-flex align-items-center mb-3">
-          <div class="avatar me-3"><span class="avatar-initial rounded bg-label-warning"><i class="bx bx-receipt"></i></span></div>
-          <div><h6 class="mb-0">③ 입식·출하·판매 신고서</h6><small class="text-muted">신고인·어업권자 작성</small></div>
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="avatar flex-shrink-0"><span class="avatar-initial rounded bg-label-warning"><i class="bx bx-receipt"></i></span></div>
+          <div>
+            <h6 class="mb-1">③ 입식·출하·판매 신고서</h6>
+            <span class="badge bg-label-warning">재난 전 신고 필수</span> <small class="text-muted ms-1">신고인·어업권자 작성</small>
+          </div>
         </div>
-        <span class="badge bg-label-warning mb-2">재난 전 신고 필수</span>
         <p class="mb-0 small">평소 입식 후 20일, 출하·판매는 다음 달 5일까지 신고합니다. 재난 전에 신고한 경우에만 재난지원금이 나옵니다.</p>
       </div>
     </div>
@@ -99,41 +107,26 @@
 </div>
 
 <!-- 신고 순서 -->
-<div class="card mb-4" id="how">
-  <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-    <h5 class="card-title m-0">신고 순서</h5>
-    <a href="{{ url_for('main.apply') }}" class="btn btn-sm btn-primary"><i class="bx bx-edit-alt me-1"></i> 피해보상 서류 작성</a>
-  </div>
+<div class="card">
   <div class="card-body">
+    <h5 class="card-title mb-3">신고 순서</h5>
     <div class="row g-3">
+      {% for no, tone, title, text in [
+        (1, "danger", "피해 즉시", "② 어업피해발생신고서를 읍·면·동에 냅니다."),
+        (2, "primary", "재난 종료 후 10일 안", "①과 ③을 매매전표·수산종자 구입 서류와 함께 시·군·구에 냅니다."),
+        (3, "info", "피해정밀조사", "조사반이 ④ 피해조사 서식을 씁니다. 수온 기록·사진·사료 기록을 준비합니다."),
+        (4, "success", "지원 확정", "담당 공무원이 피해를 확인하고 재난지원금 지급 대상을 확정합니다."),
+      ] %}
       <div class="col-md-6 col-xl-3">
         <div class="step">
-          <span class="badge rounded-pill bg-danger">1</span>
-          <h6 class="mt-3 mb-1">피해 즉시</h6>
-          <p class="small mb-0">② 어업피해발생신고서를 읍·면·동에 냅니다.</p>
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge rounded-pill bg-{{ tone }}">{{ no }}</span>
+            <h6 class="mb-0">{{ title }}</h6>
+          </div>
+          <p class="small mb-0">{{ text }}</p>
         </div>
       </div>
-      <div class="col-md-6 col-xl-3">
-        <div class="step">
-          <span class="badge rounded-pill bg-primary">2</span>
-          <h6 class="mt-3 mb-1">재난 종료 후 10일 안</h6>
-          <p class="small mb-0">① 자연재난 피해신고서와 ③ 신고서를 매매전표·수산종자 구입 서류와 함께 시·군·구에 냅니다.</p>
-        </div>
-      </div>
-      <div class="col-md-6 col-xl-3">
-        <div class="step">
-          <span class="badge rounded-pill bg-info">3</span>
-          <h6 class="mt-3 mb-1">피해정밀조사</h6>
-          <p class="small mb-0">조사반이 ④ 양식생물 피해조사 서식을 씁니다. 수온 측정 기록·사진·사료 기록을 준비합니다.</p>
-        </div>
-      </div>
-      <div class="col-md-6 col-xl-3">
-        <div class="step">
-          <span class="badge rounded-pill bg-success">4</span>
-          <h6 class="mt-3 mb-1">지원 확정</h6>
-          <p class="small mb-0">담당 공무원이 피해를 확인하고 재난지원금 지급 대상을 확정합니다.</p>
-        </div>
-      </div>
+      {% endfor %}
     </div>
   </div>
 </div>
