@@ -104,5 +104,5 @@ def test_f03_values(demo):
 def test_bundle_has_three_files(demo):
     name, data, notes = build_all(demo)
     assert name.endswith(".zip")
-    with zipfile.ZipFile(io.BytesIO(data)) as zf:
+    with zipfile.ZipFile(io.BytesIO(data), metadata_encoding="cp949") as zf:
         assert len(zf.namelist()) == 3

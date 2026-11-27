@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from pathlib import PurePath
 
 from .model import EVIDENCE
+from .zip_ko import cp949_safe
 
 MAX_TOTAL_BYTES = 20 * 1024 * 1024   # 합계 20MB
 MAX_FILES = 30
@@ -33,10 +34,13 @@ class Attachment:
 
 
 def safe_name(name: str) -> str:
-    """경로·특수문자를 빼고 80자 안으로 줄인 파일 이름."""
+    """경로·특수문자를 빼고 80자 안으로 줄인 파일 이름.
+
+    묶음(zip) 안 이름은 Windows 탐색기가 읽을 수 있게 CP949로 쓰므로 CP949에 없는 글자(이모지 등)도 '_'로 바꾼다.
+    """
     base = PurePath(str(name).replace("\\", "/")).name
-    base = unicodedata.normalize("NFC", base)
-    base = re.sub(r'[\x00-\x1f<>:"/\\|?*]', "_", base).strip(" .")
+    base = unicodedata.normalize("NFC", base)   # macOS에서 온 풀어쓴 한글을 모아쓰기로
+    base = cp949_safe(re.sub(r'[\x00-\x1f<>:"/\\|?*]', "_", base)).strip(" .")
     if not base:
         base = "파일"
     stem, dot, ext = base.rpartition(".")

@@ -56,7 +56,7 @@ def test_download_form(client, demo_data, form_id):
 def test_download_all_zip(client, demo_data):
     res = client.post("/api/forms/all", json=demo_data)
     assert res.status_code == 200
-    with zipfile.ZipFile(io.BytesIO(res.data)) as zf:
+    with zipfile.ZipFile(io.BytesIO(res.data), metadata_encoding="cp949") as zf:
         assert len(zf.namelist()) == 3
 
 
@@ -105,7 +105,7 @@ def test_bundle_with_evidence(client, demo_data):
     ])
     assert res.status_code == 200, res.get_data(as_text=True)
     assert "제출묶음" in unquote(res.headers["Content-Disposition"])
-    with zipfile.ZipFile(io.BytesIO(res.data)) as zf:
+    with zipfile.ZipFile(io.BytesIO(res.data), metadata_encoding="cp949") as zf:
         names = zf.namelist()
         assert sum(n.startswith("1_서식") and n.endswith(".hwpx") for n in names) == 3
         assert "2_증빙/02_매매전표/전표 1.pdf" in names
@@ -120,7 +120,7 @@ def test_bundle_with_evidence(client, demo_data):
 def test_bundle_without_files(client, demo_data):
     res = _bundle(client, demo_data, [])
     assert res.status_code == 200
-    with zipfile.ZipFile(io.BytesIO(res.data)) as zf:
+    with zipfile.ZipFile(io.BytesIO(res.data), metadata_encoding="cp949") as zf:
         assert "제출목록.txt" in zf.namelist()
 
 

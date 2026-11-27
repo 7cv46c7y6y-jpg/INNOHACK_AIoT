@@ -11,7 +11,7 @@ import io
 import zipfile
 from datetime import date
 
-from .. import calc, guidance, validate
+from .. import calc, guidance, validate, zip_ko
 from ..attachments import Attachment
 from ..model import EVIDENCE, Case
 from . import f01_disaster_report, f02_fishery_report, f03_stocking_report
@@ -46,7 +46,7 @@ def build_all(case: Case) -> tuple[str, bytes, dict[str, list[str]]]:
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
         for form_id in FORMS:
             name, data, form_notes = build(form_id, case)
-            zf.writestr(name, data)
+            zip_ko.add(zf, name, data)
             notes[form_id] = form_notes
     return f"초안_피해신고서류_3종_{_day(case):%Y%m%d}.zip", buf.getvalue(), notes
 
@@ -105,10 +105,11 @@ def build_bundle(case: Case, attachments: list[Attachment]) -> tuple[str, bytes]
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
         for form_id in FORMS:
             name, data, form_notes = build(form_id, case)
-            zf.writestr(f"{FORM_DIR}/{name}", data)
+            zip_ko.add(zf, f"{FORM_DIR}/{name}", data)
             notes[form_id] = form_notes
         order = {key: i for i, key in enumerate(EVIDENCE)}
         for a in sorted(attachments, key=lambda a: order[a.key]):
-            zf.writestr(f"{EVIDENCE_DIR}/{EVIDENCE[a.key]['folder']}/{a.filename}", a.data)
-        zf.writestr("제출목록.txt", "﻿" + checklist(case, attachments, notes))
+            zip_ko.add(zf, f"{EVIDENCE_DIR}/{EVIDENCE[a.key]['folder']}/{a.filename}", a.data)
+        # 메모장에서 한글이 깨지지 않게 UTF-8 BOM 을 붙인다
+        zip_ko.add(zf, "제출목록.txt", "\ufeff" + checklist(case, attachments, notes))
     return f"초안_피해신고_제출묶음_{_day(case):%Y%m%d}.zip", buf.getvalue()
