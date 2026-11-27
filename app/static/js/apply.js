@@ -354,30 +354,26 @@
       <div class="list-group">
         ${g.forms.map((f) => `<div class="list-group-item d-flex justify-content-between align-items-start flex-wrap gap-2">
           <div><div class="fw-semibold">${esc(f.name)}</div>
-            <small class="text-muted">${esc(f.when)} · ${esc(f.where)}${f.due ? ` · 참고 기한 <b>${esc(f.due)}</b>` : ""}</small>
-            ${(notes[f.id] || []).length ? `<div class="small text-warning mt-1">${(notes[f.id] || []).map(esc).join("<br>")}</div>` : ""}</div>
+            <small class="text-muted">${esc(f.when)} · ${esc(f.where)}${f.due ? ` · 참고 기한 <b>${esc(f.due)}</b>` : ""}</small></div>
           <button type="button" class="btn btn-sm btn-outline-primary" data-download="${f.id}" ${disabled}><i class="bx bx-download"></i> 이 서식만</button>
         </div>`).join("")}
       </div>
     </div></div>`);
 
-    if (v.warnings.length) parts.push(`<div class="alert alert-warning"><h6 class="alert-heading mb-2">확인할 것</h6>${list(v.warnings.map((w) => esc(w.message)))}</div>`);
-    if (v.infos.length) parts.push(`<div class="alert alert-info">${list(v.infos.map((i) => esc(i.message)))}</div>`);
-    parts.push(`<div class="alert alert-secondary"><h6 class="alert-heading mb-2">직접 하실 일</h6>${list(v.manual.map(esc))}</div>`);
-
-    const unknown = Object.entries(v.unknown).filter(([, items]) => items.length);
-    if (unknown.length) {
-      parts.push(`<div class="mb-3"><h6>미확인 항목 <small class="text-muted">(서식에서 빈칸)</small></h6>
-        ${unknown.map(([f, items]) => `<p class="small mb-1"><b>${esc(f)}</b>: ${items.map(esc).join(", ")}</p>`).join("")}</div>`);
-    }
-
-    parts.push(`<h6 class="mt-4">자연재난 피해신고서 3쪽 동의 5가지 <small class="text-muted">(동의하는 항목에만 직접 서명)</small></h6>
-      <div class="table-responsive mb-3"><table class="table table-sm">
-        <thead><tr><th>동의</th><th>뜻</th><th>동의하지 않으면</th></tr></thead>
-        <tbody>${g.consents.map((c) => `<tr><td>${esc(c.name)}</td><td>${esc(c.meaning)}</td><td>${esc(c.if_not)}</td></tr>`).join("")}</tbody>
-      </table></div>`);
-
-    parts.push(`<h6>양식생물 피해조사 준비</h6><p class="small">${esc(g.survey_note)}</p>${list(g.survey_prep.map(esc))}`);
+    // 꼭 필요한 것만 빨간 상자에: 제출 전에 확인할 것(경고·칸 넘침) / 직접 하셔야 할 일(직접 적기·서명·빈칸)
+    const formName = Object.fromEntries(g.forms.map((f) => [f.id, f.name]));
+    const checks = [
+      ...v.warnings.map((w) => esc(w.message)),
+      ...Object.entries(notes).flatMap(([id, items]) => items.map((n) => `<b>${esc(formName[id] || id)}</b>: ${esc(n)}`)),
+    ];
+    const blanks = Object.entries(v.unknown).filter(([, items]) => items.length)
+      .map(([form, items]) => `<b>${esc(form)}</b>: ${items.map(esc).join(", ")}`);
+    const todo = v.manual.map(esc);
+    if (blanks.length) todo.push(`서식에 채우지 못한 곳(빈칸 또는 '미확인')은 내려받은 뒤 직접 채워 주세요.${list(blanks)}`);
+    parts.push(`<div class="alert alert-danger review-must mb-0" role="alert">
+      ${checks.length ? `<h6 class="alert-heading"><i class="bx bx-error-circle me-1"></i>제출 전에 꼭 확인하세요</h6>${list(checks)}<hr>` : ""}
+      <h6 class="alert-heading"><i class="bx bx-edit me-1"></i>직접 하셔야 할 일</h6>${list(todo)}
+    </div>`);
 
     return parts.join("");
   }

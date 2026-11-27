@@ -49,6 +49,10 @@ def test_review_demo(client, demo_data):
     assert out["summary"]["damage_rate"] == 13.33
     assert len(out["guidance"]["forms"]) == 3
     assert set(out["notes"]) == {"f01", "f02", "f03"}
+    assert not any(out["notes"].values())                 # 글자 축소만 한 칸은 알리지 않음 (넘친 칸만 알림)
+    manual = " ".join(out["validation"]["manual"])
+    assert "회색 칸" not in manual and "행정정보 공동이용" in manual
+    assert "consents" not in out["guidance"] and "survey_prep" not in out["guidance"]
 
 
 @pytest.mark.parametrize("form_id", ["f01", "f02", "f03"])
@@ -110,6 +114,7 @@ def test_bundle_with_evidence(client, demo_data):
         assert "2_증빙/02_매매전표/전표 1 (2).pdf" in names
         assert "2_증빙/06_현장측정기록/수온기록.xlsx" in names
         text = zf.read("제출목록.txt").decode("utf-8-sig")
+        assert "줄였습니다" not in text
         assert "매매전표" in text and "전표 1.pdf" in text
         assert "현장 측정 기록 →" in text          # 첨부하면 준비됨으로 본다
         assert "[아직 준비하지 않은 증빙]" not in text

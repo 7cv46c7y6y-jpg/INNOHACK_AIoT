@@ -30,7 +30,7 @@ def visual_len(text: str) -> int:
 class FormFiller:
     def __init__(self, template_name: str):
         self.doc = HwpxDocument.open(TEMPLATE_DIR / template_name)
-        self.notes: list[str] = []   # 글자 축소 등 확인할 점
+        self.notes: list[str] = []   # 칸에 다 들어가지 않은 값 (글자 축소만 한 경우는 알리지 않음)
         self.mark = rules.get("common", "check_mark", "√")
 
     # ------------------------------------------------------------ 찾기
@@ -155,10 +155,6 @@ class FormFiller:
         font = getattr(result, "font_pt", None)
         if not ok or overflow:
             self.notes.append(f"'{label}' 값이 칸에 다 들어가지 않아 줄이 늘어날 수 있습니다. 한글에서 확인해 주세요.")
-        elif getattr(result, "style_changed", False) and font:
-            before = (getattr(result, "applied_style_changes", {}) or {}).get("from_font_pt")
-            if before is not None and before > font:
-                self.notes.append(f"'{label}' 값은 칸에 맞추려고 글자를 {font:g}pt로 줄였습니다.")
 
     def to_bytes(self) -> bytes:
         return self.doc.to_bytes()

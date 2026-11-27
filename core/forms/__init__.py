@@ -91,7 +91,7 @@ def checklist(case: Case, attachments: list[Attachment], notes: dict[str, list[s
         lines += ["", "[확인할 것]"] + [f"- {w}" for w in warnings]
     unknown = [(form, items) for form, items in v["unknown"].items() if items]
     if unknown:
-        lines += ["", "[미확인 항목 (서식에서 빈칸)]"] + [f"- {form}: {', '.join(items)}" for form, items in unknown]
+        lines += ["", "[직접 채울 곳 (빈칸 또는 '미확인')]"] + [f"- {form}: {', '.join(items)}" for form, items in unknown]
     lines += ["", "이 묶음은 시연용 서비스에서 만든 초안입니다. 공적 피해 확인과 제출은 담당 기관 안내를 따르세요."]
     return "\r\n".join(lines) + "\r\n"
 

@@ -58,6 +58,13 @@ body { word-break: keep-all; }
 }
 #section-nav .list-group-item.active { background: rgba(105, 108, 255, 0.12); color: #696cff; border-color: transparent; font-weight: 600; }
 
+/* 검토 결과: 꼭 필요한 것은 빨간 상자 */
+.review-must { border: 1px solid rgba(255, 62, 29, 0.4); }
+.review-must .alert-heading { display: flex; align-items: center; font-weight: 700; color: #ff3e1d; margin-bottom: 0.5rem; }
+.review-must li { margin-bottom: 4px; }
+.review-must li ul { margin-top: 4px; }
+.review-must hr { border-color: rgba(255, 62, 29, 0.35); opacity: 1; margin: 0.9rem 0; }
+
 /* 오류 위치로 이동할 때 깜빡임 */
 .flash { animation: ac-flash 1.5s ease; }
 @keyframes ac-flash { 0%, 60% { box-shadow: 0 0 0 0.25rem rgba(255, 62, 29, 0.35); } 100% { box-shadow: none; } }
