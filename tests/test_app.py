@@ -1,4 +1,5 @@
 import io
+import json
 import zipfile
 from urllib.parse import unquote
 
@@ -18,8 +19,14 @@ def client(tmp_path, monkeypatch):
 
 
 def test_pages(client):
-    for url in ("/", "/map", "/healthz"):
+    for url in ("/", "/apply", "/map", "/healthz"):
         assert client.get(url).status_code == 200
+    home = client.get("/").get_data(as_text=True)
+    assert "피해보상 서류 작성" in home
+    page = client.get("/apply").get_data(as_text=True)
+    for section in ("sec-disaster", "sec-farm", "sec-records", "sec-damage", "sec-extra", "sec-evidence", "sec-review"):
+        assert section in page        # 한 페이지에 모든 단계
+    assert 'data-evidence-files="sales_slips"' in page
 
 
 def test_review_demo(client, demo_data):
@@ -75,3 +82,58 @@ def test_farms_share_without_personal_info(client, demo_data):
 def test_farms_needs_consent(client, demo_data):
     demo_data["farm"]["share"] = False
     assert client.post("/api/farms", json=demo_data).status_code == 400
+
+
+def _bundle(client, demo_data, files):
+    data = {"case": json.dumps(demo_data, ensure_ascii=False)}
+    for field, name, content in files:
+        data.setdefault(field, [])
+        data[field].append((io.BytesIO(content), name))
+    return client.post("/api/bundle", data=data, content_type="multipart/form-data")
+
+
+def test_bundle_with_evidence(client, demo_data):
+    demo_data["evidence"]["measurement_records"] = False
+    res = _bundle(client, demo_data, [
+        ("evidence.sales_slips", "전표 1.pdf", b"%PDF-1.4 test"),
+        ("evidence.sales_slips", "전표 1.pdf", b"%PDF-1.4 again"),          # 같은 이름은 (2)로
+        ("evidence.measurement_records", "수온기록.xlsx", b"PK fake"),
+    ])
+    assert res.status_code == 200, res.get_data(as_text=True)
+    assert "제출묶음" in unquote(res.headers["Content-Disposition"])
+    with zipfile.ZipFile(io.BytesIO(res.data)) as zf:
+        names = zf.namelist()
+        assert sum(n.startswith("1_서식") and n.endswith(".hwpx") for n in names) == 3
+        assert "2_증빙/02_매매전표/전표 1.pdf" in names
+        assert "2_증빙/02_매매전표/전표 1 (2).pdf" in names
+        assert "2_증빙/06_현장측정기록/수온기록.xlsx" in names
+        text = zf.read("제출목록.txt").decode("utf-8-sig")
+        assert "매매전표" in text and "전표 1.pdf" in text
+        assert "현장 측정 기록 →" in text          # 첨부하면 준비됨으로 본다
+        assert "[아직 준비하지 않은 증빙]" not in text
+
+
+def test_bundle_without_files(client, demo_data):
+    res = _bundle(client, demo_data, [])
+    assert res.status_code == 200
+    with zipfile.ZipFile(io.BytesIO(res.data)) as zf:
+        assert "제출목록.txt" in zf.namelist()
+
+
+def test_bundle_rejects_bad_type(client, demo_data):
+    res = _bundle(client, demo_data, [("evidence.photos", "virus.exe", b"MZ")])
+    assert res.status_code == 400
+    assert "형식" in res.get_json()["error"]
+
+
+def test_bundle_rejects_too_big(client, demo_data, monkeypatch):
+    from core import attachments
+    monkeypatch.setattr(attachments, "MAX_TOTAL_BYTES", 10)
+    res = _bundle(client, demo_data, [("evidence.photos", "a.jpg", b"x" * 20)])
+    assert res.status_code == 400
+
+
+def test_bundle_blocked_on_error(client, demo_data):
+    demo_data["victim"]["name"] = ""
+    res = _bundle(client, demo_data, [])
+    assert res.status_code == 422

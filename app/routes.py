@@ -1,10 +1,12 @@
 """화면과 API.
 
-- GET  /                 입력 화면 (단계별)
+- GET  /                 대시보드 (피해보상 서류 작성 버튼, 서식 3종 기한, 피해 지도 요약)
+- GET  /apply            피해보상 서류 작성 (한 페이지: 재해·어가·면허·사육 기록·피해·추가 질문·증빙 첨부·검토)
 - GET  /map              가두리 피해 지도
 - GET  /api/demo         시연 사례
 - POST /api/review       계산·검증·안내 (입력 JSON)
 - POST /api/forms/<id>   서식 HWPX 내려받기 (f01, f02, f03, all=zip). 생성 파일은 서버에 저장하지 않는다.
+- POST /api/bundle       제출 묶음 zip (multipart: case=JSON, evidence.<항목>=파일들). 첨부 파일도 저장하지 않는다.
 - GET  /api/farms        지도 데이터
 - POST /api/farms        지도에 올리기 (개인 식별 정보는 저장하지 않음)
 """
@@ -18,9 +20,9 @@ from pathlib import Path
 from flask import Blueprint, jsonify, render_template, request, send_file
 from werkzeug.exceptions import HTTPException
 
-from core import calc, guidance, validate
-from core.forms import FORMS, build, build_all
-from core.model import Case
+from core import attachments, calc, guidance, validate
+from core.forms import FORMS, build, build_all, build_bundle
+from core.model import EVIDENCE, Case
 
 from . import farms
 
@@ -55,8 +57,20 @@ def _http_error(err: HTTPException):
 
 # ------------------------------------------------------------------ 화면
 @bp.get("/")
-def index():
-    return render_template("index.html")
+def dashboard():
+    return render_template("dashboard.html")
+
+
+@bp.get("/apply")
+def apply():
+    return render_template(
+        "apply.html",
+        evidence_items=EVIDENCE,
+        accept=attachments.ACCEPT,
+        max_bytes=attachments.MAX_TOTAL_BYTES,
+        max_mb=attachments.MAX_TOTAL_BYTES // (1024 * 1024),
+        max_files=attachments.MAX_FILES,
+    )
 
 
 @bp.get("/map")
@@ -109,6 +123,36 @@ def download(form_id: str):
         name, data, _ = build(form_id, case)
         mime = HWPX_MIME
     response = send_file(io.BytesIO(data), mimetype=mime, as_attachment=True, download_name=name)
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
+@bp.post("/api/bundle")
+def bundle():
+    raw = request.form.get("case")
+    try:
+        data = json.loads(raw) if raw else None
+    except json.JSONDecodeError:
+        data = None
+    if not isinstance(data, dict):
+        raise BadInput("입력 형식이 올바르지 않습니다.")
+    case = Case.from_dict(data)
+    files: dict[str, list[tuple[str, bytes]]] = {}
+    for field, storage in request.files.items(multi=True):
+        if not field.startswith("evidence."):
+            continue
+        files.setdefault(field.split(".", 1)[1], []).append((storage.filename or "파일", storage.read()))
+    try:
+        items = attachments.collect(files)
+    except attachments.AttachmentError as err:
+        raise BadInput(str(err)) from err
+    for item in items:
+        case.evidence[item.key] = True
+    result = validate.check(case)
+    if not result["ok"]:
+        return jsonify(error="입력 오류를 먼저 고쳐 주세요.", errors=result["errors"]), 422
+    name, data_zip = build_bundle(case, items)
+    response = send_file(io.BytesIO(data_zip), mimetype="application/zip", as_attachment=True, download_name=name)
     response.headers["Cache-Control"] = "no-store"
     return response
 

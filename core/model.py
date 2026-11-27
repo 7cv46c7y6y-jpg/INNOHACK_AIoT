@@ -350,15 +350,24 @@ class Form01Extra:
         )
 
 
-EVIDENCE_ITEMS = {
-    "photos": "피해 사진 (생존·폐사·빈사 개체, 양식장 전경)",
-    "sales_slips": "매매전표 (출하·판매)",
-    "seed_docs": "수산종자 구입(생산) 관련 서류",
-    "license_copy": "면허(허가)증 사본",
-    "feed_receipts": "사료 구입 영수증",
-    "measurement_records": "현장 측정 기록 (수온·용존산소 등, 측정자·시각·위치·기기)",
-    "emergency_records": "응급조치·사료 공급 기록",
+# 증빙 항목: label(이름), detail(검토 화면 설명), hint(첨부 칸 안내), folder(제출 묶음 폴더), badge(쓰임)
+EVIDENCE = {
+    "photos": {"label": "피해 사진", "detail": "생존·폐사·빈사 개체, 양식장 전경",
+               "hint": "생존·폐사·빈사 개체의 아가미·체표, 양식장 전경", "folder": "01_피해사진", "badge": "조사 준비"},
+    "sales_slips": {"label": "매매전표", "detail": "출하·판매",
+                    "hint": "출하·판매 때 받은 전표. ③ 신고서에 붙입니다.", "folder": "02_매매전표", "badge": "③ 첨부"},
+    "seed_docs": {"label": "수산종자 구입(생산) 관련 서류", "detail": "",
+                  "hint": "종자 구입 영수증, 생산 기록 등. ③ 신고서에 붙입니다.", "folder": "03_수산종자_구입서류", "badge": "③ 첨부"},
+    "license_copy": {"label": "면허(허가)증 사본", "detail": "",
+                     "hint": "어업권·양식업 면허(허가)증", "folder": "04_면허증_사본", "badge": ""},
+    "feed_receipts": {"label": "사료 구입 영수증", "detail": "",
+                      "hint": "③의 사료 구입 내역 근거", "folder": "05_사료_구입영수증", "badge": ""},
+    "measurement_records": {"label": "현장 측정 기록", "detail": "수온·용존산소 등, 측정자·시각·위치·기기",
+                            "hint": "수온·용존산소·pH·염분 기록 (측정자·시각·위치·기기 함께)", "folder": "06_현장측정기록", "badge": "조사 준비"},
+    "emergency_records": {"label": "응급조치·사료 공급 기록", "detail": "",
+                          "hint": "액화산소 공급, 사료 공급 중단 등 기록", "folder": "07_응급조치기록", "badge": "조사 준비"},
 }
+EVIDENCE_ITEMS = {k: f"{v['label']} ({v['detail']})" if v["detail"] else v["label"] for k, v in EVIDENCE.items()}
 
 
 @dataclass

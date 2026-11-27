@@ -1,29 +1,40 @@
-{% extends "base.html" %}
-{% block title %}아쿠아클레임 · 가두리 피해 지도{% endblock %}
+{% extends "layout.html" %}
+{% block title %}피해 지도 · 아쿠아클레임{% endblock %}
+{% block heading %}가두리 수온·폐사 현황{% endblock %}
+
 {% block content %}
-<section class="map-page">
-  <h1>가두리 수온·폐사 현황</h1>
-  <p class="lead">어가가 입력한 가두리 위치와 폐사율, 직접 잰 수온을 보여 줍니다.</p>
-  <div class="notice">
-    모든 값은 <b>어가 자체 입력·미확인</b> 자료이며 공적으로 확인된 수온·피해 정보가 아닙니다.
-    회색 테두리 점은 시연용 가상 데이터이고, 화면에서 새로 올린 값은 서버가 재시작되면 지워질 수 있습니다.
-    이름·주소·면허번호는 지도에 올라가지 않습니다.
+<div class="alert alert-primary small" role="alert">
+  모든 값은 <b>어가 자체 입력·미확인</b> 자료이며 공적으로 확인된 수온·피해 정보가 아닙니다.
+  점선 테두리는 시연용 가상 데이터이고, 화면에서 새로 올린 값은 서버가 재시작되면 지워질 수 있습니다.
+  이름·주소·면허번호는 지도에 올라가지 않습니다.
+</div>
+<div class="row">
+  <div class="col-lg-9 mb-4">
+    <div class="card">
+      <div class="card-body p-2">
+        <div id="farm-map" class="map-box" style="height: 600px" role="region" aria-label="가두리 피해 지도"></div>
+      </div>
+    </div>
   </div>
-  <div class="map-layout">
-    <div id="farm-map" class="map large" role="region" aria-label="가두리 피해 지도"></div>
-    <aside class="map-side">
-      <h3>폐사율 구간</h3>
-      <ul class="legend">
-        <li><i class="dot low"></i> 10% 미만</li>
-        <li><i class="dot mid"></i> 10~30%</li>
-        <li><i class="dot high"></i> 30% 이상</li>
-      </ul>
-      <h3>요약</h3>
-      <div id="map-summary">불러오는 중…</div>
-    </aside>
+  <div class="col-lg-3 mb-4">
+    <div class="card mb-4">
+      <div class="card-header pb-2"><h6 class="m-0">폐사율 구간</h6></div>
+      <div class="card-body">
+        <div class="d-flex flex-column gap-2 small">
+          <span><i class="dot dot-low"></i> 10% 미만</span>
+          <span><i class="dot dot-mid"></i> 10~30%</span>
+          <span><i class="dot dot-high"></i> 30% 이상</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header pb-2"><h6 class="m-0">요약</h6></div>
+      <div class="card-body small" id="map-summary">불러오는 중…</div>
+    </div>
   </div>
-</section>
+</div>
 {% endblock %}
+
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/map.js') }}"></script>
 {% endblock %}

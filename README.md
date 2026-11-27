@@ -1,6 +1,6 @@
 # 아쿠아클레임 (INNOHACK_AIoT)
 
-피해 양식어업인이 기록을 한 번 입력하면, 어업인이 직접 써야 하는 공식 서식 3종의 초안(HWPX)을 만들고, 누락·오류·기한을 알려 주며, 입력한 피해를 가두리 단위 지도로 보여 주는 웹 서비스입니다.
+피해 양식어업인이 기록을 한 번 입력하면, 어업인이 직접 써야 하는 공식 서식 3종의 초안(HWPX)을 만들고, 증빙 서류와 함께 제출 묶음으로 내려 주며, 누락·오류·기한을 알려 주고, 입력한 피해를 가두리 단위 지도로 보여 주는 웹 서비스입니다.
 
 | 서식 | 앱이 하는 일 |
 |---|---|
@@ -9,7 +9,26 @@
 | ③ 입식·출하·판매 신고서 | 자동 작성 + 재난 전 신고 여부 확인 |
 | ④ 양식생물 피해조사 | 조사반 서식이라 준비 자료만 안내 |
 
-> 시연용입니다. 실제 개인정보를 넣지 마세요. 주민등록번호·계좌번호는 받지 않고, 서명·도장·공무원 칸(회색 칸)은 채우지 않습니다. 만든 서식은 서버에 저장하지 않습니다.
+## 화면
+
+| 화면 | 주소 | 내용 |
+|---|---|---|
+| 대시보드 | `/` | **피해보상 서류 작성** 버튼, 가두리 피해 현황, 서식 3종 기한, 지도 미리보기, 신고 순서 |
+| 피해보상 서류 작성 | `/apply` | 재해 → 어가·면허·가두리 위치 → 사육 기록 → 이번 피해 → 추가 질문 → 증빙 첨부 → 검토·받기를 한 페이지에서 |
+| 피해 지도 | `/map` | 가두리 단위 수온·폐사율 (어가 자체 입력·미확인) |
+
+검토를 마치면 **제출 묶음 받기**로 아래 zip 하나를 받습니다.
+
+```
+초안_피해신고_제출묶음_YYYYMMDD.zip
+├─ 1_서식(서명 전 초안)/   ② ① ③ 서식 HWPX
+├─ 2_증빙/01_피해사진/ …   첨부한 증빙 (항목별 폴더)
+└─ 제출목록.txt            어디에 언제 낼지, 첨부한 것과 빠진 것, 직접 할 일
+```
+
+증빙 첨부는 합계 20MB, 30개까지이며 사진·PDF·한글·워드·엑셀만 받습니다.
+
+> 시연용입니다. 실제 개인정보를 넣지 마세요. 주민등록번호·계좌번호는 받지 않고, 서명·도장·공무원 칸(회색 칸)은 채우지 않습니다. 만든 서식과 첨부한 증빙은 서버에 저장하지 않습니다.
 
 자세한 요구사항은 [docs/PRD.md](docs/PRD.md), 입력 항목과 서식 칸의 대응은 [docs/FIELD_MAP.md](docs/FIELD_MAP.md)에 있습니다.
 
@@ -27,7 +46,7 @@ pip install -r requirements-dev.txt
 python run.py
 ```
 
-브라우저에서 http://127.0.0.1:5000 을 열고 **시연 데이터로 채우기**를 누르면 통영 가상 어가 사례로 바로 시연할 수 있습니다.
+브라우저에서 http://127.0.0.1:5000 을 열고 대시보드의 **시연 데이터로 보기**를 누르면 통영 가상 어가 사례가 채워진 작성 화면이 열립니다.
 
 - PowerShell에서 `.venv\Scripts\activate`가 막히면 먼저 `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`를 실행하세요.
 - VS Code에서는 `Ctrl+Shift+P` → "Python: Select Interpreter"에서 `.venv`를 고르면 됩니다.
@@ -35,7 +54,7 @@ python run.py
 ## 테스트와 샘플
 
 ```bat
-pytest                              :: 계산·검증·서식·화면 테스트
+pytest                              :: 계산·검증·서식·첨부·화면 테스트
 python scripts\make_samples.py      :: samples\ 에 서식 3종 샘플 생성
 python scripts\build_templates.py   :: 원본(forms_src)으로 템플릿(forms_tpl) 다시 만들기
 ```
@@ -50,8 +69,9 @@ python scripts\build_templates.py   :: 원본(forms_src)으로 템플릿(forms_t
 
 ```
 app/            Flask 화면과 API (templates/, static/, farms.py)
-core/           입력 구조(model), 계산(calc), 검증(validate), 안내(guidance)
-core/forms/     서식별 채우기 (① f01, ② f02, ③ f03)
+app/static/vendor/  Sneat 화면 템플릿, Leaflet
+core/           입력 구조(model), 계산(calc), 검증(validate), 안내(guidance), 첨부 확인(attachments)
+core/forms/     서식별 채우기 (① f01, ② f02, ③ f03), 제출 묶음
 config/         서식 기재 규칙
 data/           시연 사례, 지도 가상 데이터
 forms_src/      원본 서식 (HWP·HWPX, 법령 별지 서식)
@@ -73,3 +93,4 @@ docs/           PRD, 칸 대응표
 - 어업재해 피해조사·보고 및 복구지원 요령 제6조 (어업피해발생신고서, 지체 없이 신고)
 - 자연재난 구호 및 복구 비용 부담기준 등에 관한 규정 제9조 (자연재난 피해신고서, 입식·출하·판매 신고)
 - [python-hwpx](https://pypi.org/project/python-hwpx/) (HWP/HWPX 읽고 쓰기), [Leaflet](https://leafletjs.com/) + OpenStreetMap (지도)
+- 화면 디자인: [Sneat 무료 관리자 템플릿](https://github.com/themeselection/sneat-html-admin-template-free) (MIT, ThemeSelection)

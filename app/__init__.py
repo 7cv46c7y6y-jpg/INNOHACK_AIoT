@@ -7,7 +7,7 @@ from flask import Flask
 
 def create_app() -> Flask:
     app = Flask(__name__)
-    app.config["MAX_CONTENT_LENGTH"] = 1 * 1024 * 1024   # 입력은 JSON 1MB까지
+    app.config["MAX_CONTENT_LENGTH"] = 25 * 1024 * 1024  # 증빙 첨부 합계 20MB + 여유
     app.config["JSON_AS_ASCII"] = False
     app.json.ensure_ascii = False
 
