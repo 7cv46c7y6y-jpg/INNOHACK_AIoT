@@ -1,6 +1,6 @@
 """화면과 API.
 
-- GET  /                 대시보드 (피해보상 서류 작성 버튼, 서식 3종 기한, 피해 지도 요약)
+- GET  /                 홈 (피해보상 서류 작성 버튼, 가두리 피해 현황, 서식 3종 기한, 신고 순서)
 - GET  /apply            피해보상 서류 작성 (한 페이지: 재해·어가·면허·사육 기록·피해·추가 질문·증빙 첨부·검토)
 - GET  /map              가두리 피해 지도
 - GET  /api/demo         시연 사례
@@ -57,8 +57,8 @@ def _http_error(err: HTTPException):
 
 # ------------------------------------------------------------------ 화면
 @bp.get("/")
-def dashboard():
-    return render_template("dashboard.html")
+def home():
+    return render_template("home.html")
 
 
 @bp.get("/apply")

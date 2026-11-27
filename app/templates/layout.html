@@ -25,7 +25,7 @@
     <!-- 왼쪽 메뉴 -->
     <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
       <div class="app-brand demo">
-        <a href="{{ url_for('main.dashboard') }}" class="app-brand-link">
+        <a href="{{ url_for('main.home') }}" class="app-brand-link">
           <span class="brand-mark"><i class="bx bx-water"></i></span>
           <span class="app-brand-text demo menu-text fw-bolder ms-2">아쿠아클레임</span>
         </a>
@@ -35,9 +35,9 @@
       </div>
       <div class="menu-inner-shadow"></div>
       <ul class="menu-inner py-1">
-        <li class="menu-item {% if request.endpoint == 'main.dashboard' %}active{% endif %}">
-          <a href="{{ url_for('main.dashboard') }}" class="menu-link">
-            <i class="menu-icon tf-icons bx bx-home-circle"></i><div>대시보드</div>
+        <li class="menu-item {% if request.endpoint == 'main.home' %}active{% endif %}">
+          <a href="{{ url_for('main.home') }}" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-home-circle"></i><div>홈</div>
           </a>
         </li>
         <li class="menu-header small text-uppercase"><span class="menu-header-text">피해 신고</span></li>
@@ -53,7 +53,7 @@
         </li>
         <li class="menu-header small text-uppercase"><span class="menu-header-text">안내</span></li>
         <li class="menu-item">
-          <a href="{{ url_for('main.dashboard') }}#how" class="menu-link">
+          <a href="{{ url_for('main.home') }}#how" class="menu-link">
             <i class="menu-icon tf-icons bx bx-list-check"></i><div>신고 순서</div>
           </a>
         </li>
@@ -61,24 +61,12 @@
     </aside>
 
     <div class="layout-page">
-      <!-- 위쪽 바 -->
-      <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
-        <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
-          <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)"><i class="bx bx-menu bx-sm"></i></a>
-        </div>
-        <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-          <div class="navbar-nav align-items-center">
-            <span class="fw-semibold text-heading">{% block heading %}아쿠아클레임{% endblock %}</span>
-          </div>
-          <ul class="navbar-nav flex-row align-items-center ms-auto gap-2">
-            {% block navbar_actions %}{% endblock %}
-            <li class="nav-item"><span class="badge bg-label-warning">시연용 · 가상 데이터</span></li>
-          </ul>
-        </div>
-      </nav>
-
       <div class="content-wrapper">
         <div class="container-xxl flex-grow-1 container-p-y">
+          <!-- 휴대폰·태블릿 화면에서는 왼쪽 메뉴가 숨으므로 여는 버튼만 둔다 -->
+          <button type="button" class="btn btn-sm btn-outline-secondary layout-menu-toggle d-xl-none mb-3" aria-label="메뉴 열기">
+            <i class="bx bx-menu me-1"></i>메뉴
+          </button>
           {% block content %}{% endblock %}
         </div>
         <footer class="content-footer footer bg-footer-theme">

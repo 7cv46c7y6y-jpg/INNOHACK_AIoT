@@ -1,6 +1,5 @@
 {% extends "layout.html" %}
 {% block title %}피해보상 서류 작성 · 아쿠아클레임{% endblock %}
-{% block heading %}피해보상 서류 작성{% endblock %}
 
 {% macro fid(path) %}f-{{ path|replace('.', '-') }}{% endmacro %}
 
@@ -40,19 +39,10 @@
 
 {% macro yn(path, label, col="col-md-6") -%}{{ choice(path, label, ["예", "아니오"], True, col) }}{%- endmacro %}
 
-{% block navbar_actions %}
-<li class="nav-item d-none d-md-block"><button type="button" class="btn btn-sm btn-outline-primary" data-action="demo"><i class="bx bx-test-tube me-1"></i>시연 데이터로 채우기</button></li>
-{% endblock %}
-
 {% block content %}
 <div class="row">
 <div class="col-xl-9">
 <form id="case-form" autocomplete="off" novalidate>
-
-  <div class="alert alert-warning small" role="alert">
-    <b>시연용 화면입니다.</b> 실제 개인정보를 넣지 마세요. 주민등록번호와 계좌번호는 받지 않으며, 다운로드한 서식에 직접 적게 되어 있습니다.
-    만든 서류와 첨부한 증빙은 서버에 저장하지 않습니다.
-  </div>
 
   <!-- 1. 재해 -->
   <div class="card mb-4" id="sec-disaster">
@@ -301,17 +291,13 @@
     </div>
   </div>
 
-  <!-- 7. 검토·받기 -->
-  <div class="card mb-4" id="sec-review">
-    <h5 class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-      <span><span class="sec-no">7</span> 검토하고 서식 받기</span>
-      <button type="button" class="btn btn-primary" data-action="review"><i class="bx bx-check-shield me-1"></i>검토하기</button>
-    </h5>
-    <div class="card-body" id="review">
-      <p class="text-muted mb-0">입력을 마치면 <b>검토하기</b>를 눌러 주세요. 계산 결과, 빠진 것, 신고 기한을 확인한 뒤 서식과 제출 묶음을 받을 수 있습니다.</p>
-    </div>
-  </div>
 </form>
+
+<!-- 검토 결과: 오른쪽 '검토하고 서식 받기'를 누르면 나타난다 -->
+<div class="card mb-4" id="sec-review" hidden>
+  <h5 class="card-header"><span class="sec-no"><i class="bx bx-check-shield"></i></span> 검토 결과</h5>
+  <div class="card-body" id="review"></div>
+</div>
 </div>
 
 <!-- 오른쪽 요약 -->
@@ -339,7 +325,6 @@
         <a class="list-group-item list-group-item-action" href="#sec-damage">4. 이번 피해</a>
         <a class="list-group-item list-group-item-action" href="#sec-extra">5. 추가 질문</a>
         <a class="list-group-item list-group-item-action" href="#sec-evidence">6. 증빙 서류 첨부</a>
-        <a class="list-group-item list-group-item-action" href="#sec-review">7. 검토하고 서식 받기</a>
       </div>
     </div>
   </div>

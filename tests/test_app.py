@@ -23,6 +23,9 @@ def test_pages(client):
         assert client.get(url).status_code == 200
     home = client.get("/").get_data(as_text=True)
     assert "피해보상 서류 작성" in home
+    assert "<div>홈</div>" in home              # 메뉴 이름
+    assert "mini-map" not in home              # 지도는 피해 지도 화면에만
+    assert "layout-navbar" not in home         # 위쪽 바 없음
     page = client.get("/apply").get_data(as_text=True)
     for section in ("sec-disaster", "sec-farm", "sec-records", "sec-damage", "sec-extra", "sec-evidence", "sec-review"):
         assert section in page        # 한 페이지에 모든 단계

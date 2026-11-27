@@ -8,7 +8,6 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   font-family: var(--ac-font);
 }
 body { word-break: keep-all; }
-.text-heading { color: #566a7f; }
 
 /* Sneat demo.css 에서 필요한 것만 */
 .menu .app-brand.demo { height: 64px; margin-top: 12px; }
@@ -30,7 +29,7 @@ body { word-break: keep-all; }
   width: 28px; height: 28px; margin-right: 8px; border-radius: 8px;
   background: rgba(105, 108, 255, 0.16); color: #696cff; font-size: 0.95rem; font-weight: 700;
 }
-#case-form > .card { scroll-margin-top: 90px; }
+#case-form > .card, #sec-review { scroll-margin-top: 24px; }
 .choice-group .btn { margin-bottom: 4px; }
 .rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
 .row-card { border: 1px dashed #d9dee3; border-radius: 0.5rem; padding: 10px 12px; background: #fbfbff; }
@@ -42,7 +41,7 @@ body { word-break: keep-all; }
 
 /* 오른쪽 요약 */
 @media (min-width: 1200px) {
-  .sticky-summary { position: sticky; top: 90px; }
+  .sticky-summary { position: sticky; top: 24px; }
 }
 #section-nav .list-group-item.active { background: rgba(105, 108, 255, 0.12); color: #696cff; border-color: transparent; font-weight: 600; }
 
@@ -58,11 +57,9 @@ body { word-break: keep-all; }
 .dot-high { background: #ff3e1d; }
 .leaflet-container { font-family: var(--ac-font); }
 
-/* 신고 순서 */
-.timeline-simple { list-style: none; padding: 0; margin: 0; }
-.timeline-simple li { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; border-bottom: 1px dashed #e7e9ed; }
-.timeline-simple li:last-child { border-bottom: 0; }
-.timeline-simple .badge { min-width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; margin-top: 2px; }
+/* 홈: 신고 순서 */
+.step { height: 100%; padding: 16px 18px; border: 1px solid #e7e9ed; border-radius: 0.5rem; }
+.step .badge { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; }
 
-/* 대시보드 숫자 */
+/* 홈: 가두리 피해 현황 숫자 */
 .stat-list b { font-size: 1.05rem; }

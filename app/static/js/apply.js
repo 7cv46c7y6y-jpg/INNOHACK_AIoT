@@ -252,7 +252,8 @@
     fill({});
     Object.keys(files).forEach((k) => { files[k] = []; });
     renderEvidence();
-    document.getElementById("review").innerHTML = '<p class="text-muted mb-0">입력을 마치면 <b>검토하기</b>를 눌러 주세요.</p>';
+    document.getElementById("review").innerHTML = "";
+    document.getElementById("sec-review").hidden = true;
     toast("입력을 모두 지웠습니다.", "secondary");
   }
 
@@ -272,7 +273,7 @@
       const name = action.dataset.action;
       if (name === "demo") loadDemo();
       if (name === "clear") clearAll();
-      if (name === "review") { document.getElementById("sec-review").scrollIntoView({ behavior: "smooth" }); runReview(); }
+      if (name === "review") runReview();
     }
     const add = e.target.closest("[data-add]");
     if (add) { addRow(add.dataset.add); refreshUI(); }
@@ -306,8 +307,11 @@
   const postJson = (url) => fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(serialize()) });
 
   async function runReview() {
+    const card = document.getElementById("sec-review");
     const box = document.getElementById("review");
+    card.hidden = false;
     box.innerHTML = '<div class="d-flex align-items-center gap-2 text-muted"><div class="spinner-border spinner-border-sm"></div> 검토 중입니다…</div>';
+    card.scrollIntoView({ behavior: "smooth", block: "start" });
     try {
       const res = await postJson("/api/review");
       const out = await res.json();
@@ -316,6 +320,8 @@
     } catch (err) {
       box.innerHTML = `<div class="alert alert-danger mb-0">${esc(err.message)}</div>`;
     }
+    // 결과가 다 그려진 뒤 다시 맞춘다 (처음에는 페이지 끝이라 카드 위쪽까지 올라가지 못함)
+    card.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   const list = (items) => (items && items.length ? `<ul class="mb-0 ps-3">${items.map((i) => `<li>${i}</li>`).join("")}</ul>` : "");
