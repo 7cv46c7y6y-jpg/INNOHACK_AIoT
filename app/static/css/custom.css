@@ -32,6 +32,17 @@ body { word-break: keep-all; }
   background: rgba(105, 108, 255, 0.16); color: #696cff; font-size: 0.95rem; font-weight: 700;
 }
 #case-form > .card, #sec-review { scroll-margin-top: 24px; }
+
+/* 작성 화면: 단계 제목을 색을 채운 막대로 (단계마다 구분이 잘 되게) */
+.card-header.sec-header {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px;
+  margin-bottom: 0; padding: 0.85rem 1.5rem;
+  background: #696cff; color: #fff; font-size: 1.05rem; font-weight: 600;
+}
+.card-header.sec-header .sec-no { background: #fff; color: #696cff; margin-right: 2px; }
+.card-header.sec-header small, .card-header.sec-header .text-muted { color: rgba(255, 255, 255, 0.82) !important; font-weight: 400; }
+.card-header.sec-header .sec-badge { background: rgba(255, 255, 255, 0.22); color: #fff; font-weight: 500; }
+.card-header.sec-header + .card-body { padding-top: 1.5rem; }
 .choice-group .btn { margin-bottom: 4px; }
 .rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
 .row-card { border: 1px dashed #d9dee3; border-radius: 0.5rem; padding: 10px 12px; background: #fbfbff; }

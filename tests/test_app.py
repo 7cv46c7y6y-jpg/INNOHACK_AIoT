@@ -29,6 +29,8 @@ def test_pages(client):
     assert not any(n in home for n in "①②③④")   # 화면에는 서식 번호 대신 이름
     page = client.get("/apply").get_data(as_text=True)
     assert 'id="layout-menu"' not in page       # 작성 화면에도 왼쪽 메뉴 없음
+    assert page.count("card-header sec-header") == 7   # 단계 1~6과 검토 결과는 색 막대 제목
+    assert "data-back" in page and "뒤로가기" in page   # 바로 가기 아래 뒤로가기
     assert 'id="layout-menu"' in client.get("/map").get_data(as_text=True)   # 지도 화면에는 메뉴
     for section in ("sec-disaster", "sec-farm", "sec-records", "sec-damage", "sec-extra", "sec-evidence", "sec-review"):
         assert section in page        # 한 페이지에 모든 단계

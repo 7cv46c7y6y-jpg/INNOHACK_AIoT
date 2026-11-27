@@ -46,7 +46,7 @@
 
   <!-- 1. 재해 -->
   <div class="card mb-4" id="sec-disaster">
-    <h5 class="card-header"><span class="sec-no">1</span> 재해 정보</h5>
+    <h5 class="card-header sec-header"><span class="sec-no">1</span> 재해 정보</h5>
     <div class="card-body">
       <div class="row g-3">
         <div class="col-md-6">
@@ -67,7 +67,7 @@
 
   <!-- 2. 어가·면허 -->
   <div class="card mb-4" id="sec-farm">
-    <h5 class="card-header"><span class="sec-no">2</span> 어가·면허</h5>
+    <h5 class="card-header sec-header"><span class="sec-no">2</span> 어가·면허</h5>
     <div class="card-body">
       <h6 class="text-muted">피해자 (어업권자·행사자)</h6>
       <div class="row g-3 mb-4">
@@ -111,7 +111,7 @@
 
   <!-- 3. 사육 기록 -->
   <div class="card mb-4" id="sec-records">
-    <h5 class="card-header"><span class="sec-no">3</span> 사육 기록 <small class="text-muted">(재해 전까지)</small></h5>
+    <h5 class="card-header sec-header"><span class="sec-no">3</span> 사육 기록 <small class="text-muted">(재해 전까지)</small></h5>
     <div class="card-body">
       <p class="form-text mt-0">입식·출하·판매 신고서에 들어가고 재해 직전 사육량 계산에 쓰입니다. 이번 재해의 폐사는 4번에 입력합니다.</p>
       <div class="row g-3 mb-2">
@@ -152,7 +152,7 @@
 
   <!-- 4. 피해 -->
   <div class="card mb-4" id="sec-damage">
-    <h5 class="card-header"><span class="sec-no">4</span> 이번 피해</h5>
+    <h5 class="card-header sec-header"><span class="sec-no">4</span> 이번 피해</h5>
     <div class="card-body">
       <div class="row g-3">
         {{ field("damage.dead_count", "이번 폐사량(마리)", "number", required=True, attrs='min="0" step="1"', col="col-md-4") }}
@@ -169,7 +169,7 @@
 
   <!-- 5. 추가 질문 -->
   <div class="card mb-4" id="sec-extra">
-    <h5 class="card-header"><span class="sec-no">5</span> 추가 질문 <small class="text-muted">(자연재난 피해신고서)</small></h5>
+    <h5 class="card-header sec-header"><span class="sec-no">5</span> 추가 질문 <small class="text-muted">(자연재난 피해신고서)</small></h5>
     <div class="card-body">
       <p class="form-text mt-0">모르면 '모름'으로 두세요. 서식에서 빈칸이 되고 검토할 때 표시됩니다.</p>
       <div class="row g-3 mb-4">
@@ -243,9 +243,9 @@
 
   <!-- 6. 증빙 서류 첨부 -->
   <div class="card mb-4" id="sec-evidence">
-    <h5 class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <h5 class="card-header sec-header d-flex justify-content-between align-items-center flex-wrap gap-2">
       <span><span class="sec-no">6</span> 증빙 서류 첨부</span>
-      <span class="badge bg-label-info" id="evidence-size">첨부 0개 · 0KB / {{ max_mb }}MB</span>
+      <span class="badge sec-badge" id="evidence-size">첨부 0개 · 0KB / {{ max_mb }}MB</span>
     </h5>
     <div class="card-body">
       <p class="form-text mt-0">첨부한 파일은 서식 3종과 함께 <b>제출 묶음(zip)</b>에 항목별 폴더로 들어갑니다. 서버에는 저장하지 않습니다.
@@ -282,7 +282,7 @@
 
 <!-- 검토 결과: 오른쪽 '검토하고 서식 받기'를 누르면 나타난다 -->
 <div class="card mb-4" id="sec-review" hidden>
-  <h5 class="card-header"><span class="sec-no"><i class="bx bx-check-shield"></i></span> 검토 결과</h5>
+  <h5 class="card-header sec-header"><span class="sec-no"><i class="bx bx-check-shield"></i></span> 검토 결과</h5>
   <div class="card-body" id="review"></div>
 </div>
 </div>
@@ -314,6 +314,10 @@
         <a class="list-group-item list-group-item-action" href="#sec-evidence">6. 증빙 서류 첨부</a>
       </div>
     </div>
+    <!-- 뒤로가기: 이 사이트에서 왔으면 이전 화면으로, 아니면 홈으로 -->
+    <a href="{{ url_for('main.home') }}" class="btn btn-outline-secondary w-100 mt-xl-3" data-back>
+      <i class="bx bx-arrow-back me-1"></i>뒤로가기
+    </a>
   </div>
 </div>
 </div>

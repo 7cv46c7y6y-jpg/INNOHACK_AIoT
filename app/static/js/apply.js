@@ -216,6 +216,11 @@
   form.addEventListener("input", refreshUI);
   form.addEventListener("change", (e) => { if (!e.target.closest("[data-evidence-files]")) refreshUI(); });
 
+  // 사람이 직접 입력했는지 (뒤로가기 전에 한 번 묻기 위해)
+  let edited = false;
+  form.addEventListener("input", () => { edited = true; });
+  form.addEventListener("change", () => { edited = true; });
+
   // ------------------------------------------------------------ 버튼
   async function loadDemo() {
     const res = await fetch("/api/demo");
@@ -229,6 +234,7 @@
     renderEvidence();
     document.getElementById("review").innerHTML = "";
     document.getElementById("sec-review").hidden = true;
+    edited = false;
     toast("입력을 모두 지웠습니다.", "secondary");
   }
 
@@ -243,6 +249,17 @@
   }
 
   document.addEventListener("click", (e) => {
+    const back = e.target.closest("[data-back]");
+    if (back) {
+      e.preventDefault();
+      if ((edited || totalFiles()) && !window.confirm("입력한 내용과 첨부한 파일은 저장되지 않습니다. 뒤로 갈까요?")) return;
+      // 이 사이트 안에서 왔으면 이전 화면으로, 주소를 직접 열었으면 홈으로
+      let sameSite = false;
+      try { sameSite = !!document.referrer && new URL(document.referrer).origin === window.location.origin; } catch (err) { sameSite = false; }
+      if (sameSite && window.history.length > 1) window.history.back();
+      else window.location.href = back.href;
+      return;
+    }
     const action = e.target.closest("[data-action]");
     if (action) {
       const name = action.dataset.action;
