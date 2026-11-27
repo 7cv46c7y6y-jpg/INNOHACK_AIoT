@@ -1,7 +1,7 @@
 """화면과 API.
 
 - GET  /                 홈 (왼쪽 메뉴 없음: 피해보상 서류 작성 버튼, 신고 순서, 서식 3종 기한)
-- GET  /apply            피해보상 서류 작성 (한 페이지: 재해·어가·면허·사육 기록·피해·추가 질문·증빙 첨부·검토)
+- GET  /apply            피해보상 서류 작성 (왼쪽 메뉴 없음. 한 페이지: 재해·어가·면허·사육 기록·피해·추가 질문·증빙 첨부·검토)
 - GET  /map              가두리 피해 지도
 - GET  /api/demo         시연 사례
 - POST /api/review       계산·검증·안내 (입력 JSON)
@@ -64,6 +64,7 @@ def home():
 def apply():
     return render_template(
         "apply.html",
+        hide_menu=True,
         evidence_items=EVIDENCE,
         accept=attachments.ACCEPT,
         max_bytes=attachments.MAX_TOTAL_BYTES,

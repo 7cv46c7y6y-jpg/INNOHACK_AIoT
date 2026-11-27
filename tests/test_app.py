@@ -28,7 +28,8 @@ def test_pages(client):
     assert home.index('<h5 class="card-title mb-3">신고 순서</h5>') < home.index('<h6 class="mb-1">입식·출하·판매 신고서</h6>')
     assert not any(n in home for n in "①②③④")   # 화면에는 서식 번호 대신 이름
     page = client.get("/apply").get_data(as_text=True)
-    assert "<div>홈</div>" in page             # 작성 화면에는 왼쪽 메뉴 (이름은 '홈')
+    assert 'id="layout-menu"' not in page       # 작성 화면에도 왼쪽 메뉴 없음
+    assert 'id="layout-menu"' in client.get("/map").get_data(as_text=True)   # 지도 화면에는 메뉴
     for section in ("sec-disaster", "sec-farm", "sec-records", "sec-damage", "sec-extra", "sec-evidence", "sec-review"):
         assert section in page        # 한 페이지에 모든 단계
     assert 'data-evidence-files="sales_slips"' in page
