@@ -1,0 +1,12 @@
+{
+  "_설명": "지도 시연용 가상 어가 데이터. 실제 어가가 아니며 위치·수치는 모두 가상이다.",
+  "farms": [
+    {"id": "seed-1", "lat": 34.7300, "lng": 128.4000, "species": "조피볼락", "damage_rate": 8.5, "water_temp_c": 27.9, "measured_at": "2026-08-12 09:00", "recorded_on": "2026-08-13"},
+    {"id": "seed-2", "lat": 34.7200, "lng": 128.4400, "species": "조피볼락", "damage_rate": 22.4, "water_temp_c": 28.4, "measured_at": "2026-08-12 10:30", "recorded_on": "2026-08-13"},
+    {"id": "seed-3", "lat": 34.7950, "lng": 128.4650, "species": "참돔", "damage_rate": 4.1, "water_temp_c": 27.2, "measured_at": "2026-08-12 08:40", "recorded_on": "2026-08-12"},
+    {"id": "seed-4", "lat": 34.7800, "lng": 128.3550, "species": "조피볼락", "damage_rate": 35.8, "water_temp_c": 29.1, "measured_at": "2026-08-13 14:00", "recorded_on": "2026-08-14"},
+    {"id": "seed-5", "lat": 34.6620, "lng": 128.2700, "species": "참돔", "damage_rate": 2.3, "water_temp_c": 26.8, "measured_at": "2026-08-13 07:50", "recorded_on": "2026-08-13"},
+    {"id": "seed-6", "lat": 34.8120, "lng": 128.2150, "species": "넙치", "damage_rate": 12.7, "water_temp_c": 28.0, "measured_at": "2026-08-14 11:20", "recorded_on": "2026-08-14"},
+    {"id": "seed-7", "lat": 34.7450, "lng": 128.5300, "species": "조피볼락", "damage_rate": 41.2, "water_temp_c": 29.4, "measured_at": "2026-08-14 15:10", "recorded_on": "2026-08-15"}
+  ]
+}

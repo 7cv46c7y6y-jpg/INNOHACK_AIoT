@@ -1,0 +1,4 @@
+flask>=3.0,<4
+python-hwpx==7.0.2
+holidays>=0.60
+gunicorn>=22; platform_system != "Windows"

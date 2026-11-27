@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+{% block title %}아쿠아클레임 · 양식 재해 피해 신고서류 작성{% endblock %}
+
+{% macro field(path, label, type="text", placeholder="", required=False, hint="", attrs="", cls="") -%}
+<label class="field {{ cls }}">
+  <span class="label">{{ label }}{% if required %} <b class="req">필수</b>{% endif %}</span>
+  <input type="{{ type }}" data-path="{{ path }}" placeholder="{{ placeholder }}" {{ attrs|safe }}>
+  {% if hint %}<small class="hint">{{ hint }}</small>{% endif %}
+</label>
+{%- endmacro %}
+
+{% macro area(path, label, placeholder="", hint="") -%}
+<label class="field wide">
+  <span class="label">{{ label }}</span>
+  <textarea data-path="{{ path }}" rows="2" placeholder="{{ placeholder }}"></textarea>
+  {% if hint %}<small class="hint">{{ hint }}</small>{% endif %}
+</label>
+{%- endmacro %}
+
+{% macro yn(path, label, unknown=True) -%}
+<fieldset class="choice">
+  <legend>{{ label }}</legend>
+  <label><input type="radio" name="{{ path }}" data-path="{{ path }}" value="예"> 예</label>
+  <label><input type="radio" name="{{ path }}" data-path="{{ path }}" value="아니오"> 아니오</label>
+  {% if unknown %}<label><input type="radio" name="{{ path }}" data-path="{{ path }}" value="" checked> 모름</label>{% endif %}
+</fieldset>
+{%- endmacro %}
+
+{% macro radios(path, label, options, unknown=True) -%}
+<fieldset class="choice">
+  <legend>{{ label }}</legend>
+  {% for opt in options %}
+  <label><input type="radio" name="{{ path }}" data-path="{{ path }}" value="{{ opt }}"> {{ opt|replace("ㆍ", "·") }}</label>
+  {% endfor %}
+  {% if unknown %}<label><input type="radio" name="{{ path }}" data-path="{{ path }}" value="" checked> 모름</label>{% endif %}
+</fieldset>
+{%- endmacro %}
+
+{% block content %}
+<ol class="stepper" id="stepper">
+  <li data-go="0">시작</li>
+  <li data-go="1">재해</li>
+  <li data-go="2">어가·면허</li>
+  <li data-go="3">사육 기록</li>
+  <li data-go="4">피해</li>
+  <li data-go="5">추가 질문</li>
+  <li data-go="6">증빙</li>
+  <li data-go="7">검토·받기</li>
+</ol>
+
+<form id="case-form" autocomplete="off" novalidate>
+
+<!-- 0. 시작 -->
+<section class="step" data-step="0">
+  <h1>양식 재해 피해 신고서류,<br>한 번 입력으로 3종 초안까지</h1>
+  <p class="lead">기록을 한 번 입력하면 어업인이 직접 써야 하는 공식 서식 3종의 초안(HWPX)을 만들고, 빠진 것과 기한을 알려 드립니다.</p>
+  <div class="cards">
+    <div class="card"><b>② 어업피해발생신고서</b><span>피해가 나면 <em>지체 없이</em> 읍·면·동에 냅니다. 늦으면 피해조사에서 빠질 수 있습니다.</span></div>
+    <div class="card"><b>① 자연재난 피해신고서</b><span>재난이 끝난 날부터 <em>10일 안에</em> 시·군·구에 냅니다.</span></div>
+    <div class="card"><b>③ 입식·출하·판매 신고서</b><span>①과 함께 냅니다. <em>재난 전에</em> 신고해 둔 경우에만 재난지원금이 나옵니다.</span></div>
+    <div class="card muted"><b>④ 양식생물 피해조사</b><span>조사반이 쓰는 서식이라 준비할 자료만 안내합니다.</span></div>
+  </div>
+  <div class="notice">
+    <b>시연용 화면입니다.</b> 실제 개인정보를 넣지 마세요. 주민등록번호와 계좌번호는 받지 않으며, 다운로드한 서식에 직접 적게 되어 있습니다. 만든 서류는 서버에 저장하지 않습니다.
+  </div>
+  <div class="actions">
+    <button type="button" class="btn primary" id="load-demo">시연 데이터로 채우기</button>
+    <button type="button" class="btn" data-next>처음부터 작성</button>
+  </div>
+</section>
+
+<!-- 1. 재해 정보 -->
+<section class="step" data-step="1" hidden>
+  <h2>재해 정보</h2>
+  <div class="grid">
+    <label class="field">
+      <span class="label">재해 종류 <b class="req">필수</b></span>
+      <select data-path="disaster.kind">
+        <option value="">선택</option>
+        <option>고수온</option><option>저수온</option><option>적조</option>
+        <option>태풍</option><option>집중호우</option><option>빈산소수괴</option><option>기타</option>
+      </select>
+    </label>
+    {{ field("disaster.damage_start", "피해 발생일 (기간 시작)", "date", required=True) }}
+    {{ field("disaster.damage_end", "피해 발생 기간 끝", "date", hint="아직 진행 중이면 비워 두세요.") }}
+    {{ field("disaster.disaster_end", "재난 종료일", "date", hint="예: 고수온 특보 해제일. 넣으면 ①③ 신고 기한을 계산합니다.") }}
+    {{ field("disaster.report_date", "신고(작성) 예정일", "date", hint="서식의 날짜 칸에 들어갑니다.") }}
+  </div>
+  <p class="tip" id="deadline-tip"></p>
+</section>
+
+<!-- 2. 어가·면허 -->
+<section class="step" data-step="2" hidden>
+  <h2>피해자(어업권자·행사자)</h2>
+  <div class="grid">
+    {{ field("victim.name", "성명", required=True) }}
+    {{ field("victim.name_hanja", "성명(한자)", hint="③ 서식에 들어갑니다. 선택") }}
+    {{ field("victim.birth", "생년월일", "date") }}
+    {{ field("victim.address", "주소", required=True, cls="span2") }}
+    {{ field("victim.mobile", "휴대폰", "tel", "010-0000-0000") }}
+    {{ field("victim.phone", "전화", "tel", "055-000-0000") }}
+  </div>
+
+  <h3>신고인</h3>
+  <label class="check"><input type="checkbox" data-path="reporter_same" id="reporter-same" checked> 피해자 본인이 신고합니다</label>
+  <div id="reporter-box" hidden>
+    <div class="grid">
+      {{ field("reporter.name", "신고인 성명", required=True) }}
+      {{ field("reporter.name_hanja", "성명(한자)") }}
+      {{ field("reporter.birth", "생년월일", "date") }}
+      {{ field("reporter.address", "주소", cls="span2") }}
+      {{ field("reporter.mobile", "휴대폰", "tel") }}
+      {{ field("reporter.phone", "전화", "tel") }}
+    </div>
+    {{ radios("relation", "피해자와의 관계", ["가족", "이장ㆍ통장", "이웃"]) }}
+  </div>
+
+  <h3>면허와 양식장</h3>
+  <div class="grid">
+    {{ field("license.number", "면허(허가)번호", placeholder="제2020-0000호", required=True) }}
+    {{ field("license.period_from", "면허 기간 시작", "date") }}
+    {{ field("license.period_to", "면허 기간 끝", "date") }}
+    {{ field("license.area_ha", "면허 면적(ha)", "number", attrs='step="0.01" min="0"') }}
+    {{ field("license.fishery_type", "어업의 종류", placeholder="어류등양식업") }}
+    {{ field("license.method", "시설방법 또는 양식방법", placeholder="해상가두리식") }}
+    {{ field("license.species", "품종", placeholder="조피볼락", required=True) }}
+    {{ field("license.location", "어장 위치", placeholder="경남 통영시 ○○읍 ○○ 지선 해상", required=True, cls="span2") }}
+  </div>
+
+  <h3>가두리 위치</h3>
+  <p class="hint">지도를 눌러 가두리 위치를 찍어 주세요. 서식에는 들어가지 않고, 피해 지도에만 쓰입니다.</p>
+  <div id="pick-map" class="map small"></div>
+  <p class="coords" id="pick-coords">아직 찍지 않았습니다.</p>
+  <input type="hidden" data-path="farm.lat" id="farm-lat">
+  <input type="hidden" data-path="farm.lng" id="farm-lng">
+  <label class="check"><input type="checkbox" data-path="farm.share"> 피해 지도에 위치·품종·폐사율·수온을 공유합니다 (이름·주소·면허번호는 올라가지 않습니다)</label>
+</section>
+
+<!-- 3. 사육 기록 -->
+<section class="step" data-step="3" hidden>
+  <h2>사육 기록 (재해 전까지)</h2>
+  <p class="hint">③ 입식·출하·판매 신고서에 들어가고, 재해 직전 사육량 계산에 쓰입니다. 이번 재해의 폐사는 다음 단계에서 입력합니다.</p>
+  {{ radios("pre_disaster_reported", "재난 전에 입식·출하 신고를 했나요?", ["예", "아니오"]) }}
+  <p class="warn-inline" id="pre-report-warn" hidden>재난 전에 신고하지 않았다면 양식업 재난지원금 대상에서 빠질 수 있습니다. 지금 만드는 ③ 서식이 과거 신고 이력을 대신하지는 못합니다.</p>
+
+  <h3>입식 <small>(최대 4줄)</small></h3>
+  <div class="rows" data-rows="stocking" data-max="4" data-template="tpl-stocking"></div>
+  <button type="button" class="btn small" data-add="stocking">+ 입식 줄 추가</button>
+  <div class="grid">
+    {{ field("seed_source.name", "수산종자 구입처") }}
+    {{ field("seed_source.phone", "구입처 전화번호", "tel") }}
+  </div>
+
+  <h3>출하(판매) 또는 기존 폐사 <small>(최대 4줄)</small></h3>
+  <div class="rows" data-rows="outs" data-max="4" data-template="tpl-out"></div>
+  <button type="button" class="btn small" data-add="outs">+ 출하·폐사 줄 추가</button>
+  <div class="grid">
+    {{ field("sale.sold_at", "판매일시") }}
+    {{ field("sale.contact", "연락처", "tel") }}
+    {{ field("sale.buyer", "판매처") }}
+  </div>
+
+  <h3>사료 구입(확보) <small>(최대 2줄)</small></h3>
+  <div class="rows" data-rows="feed" data-max="2" data-template="tpl-feed"></div>
+  <button type="button" class="btn small" data-add="feed">+ 사료 줄 추가</button>
+
+  <div class="live" id="live-stock"></div>
+</section>
+
+<!-- 4. 피해 정보 -->
+<section class="step" data-step="4" hidden>
+  <h2>이번 피해</h2>
+  <div class="grid">
+    {{ field("damage.dead_count", "이번 폐사량(마리)", "number", required=True, attrs='min="0" step="1"') }}
+    {{ field("damage.dead_weight_kg", "폐사 무게(kg)", "number", hint="선택", attrs='min="0" step="0.1"') }}
+    {{ field("damage.cause_note", "피해 원인 (신고인 설명)", placeholder="고수온", hint="공식 원인이 아니며 ②에 '(추정)'을 붙여 적습니다. 비우면 재해 종류를 씁니다.") }}
+    {{ field("damage.water_temp_c", "직접 잰 수온(℃)", "number", hint="선택. 피해 지도에 표시됩니다.", attrs='step="0.1"') }}
+    {{ field("damage.temp_measured_at", "수온 측정 일시", placeholder="2026-08-12 14:00") }}
+    {{ field("damage.amount_krw", "피해액(원)", "number", hint="선택. 산정 근거가 있어야 ②에 적습니다.", attrs='min="0" step="1"') }}
+    {{ field("damage.amount_basis", "피해액 산정 근거", placeholder="예: 거래처 시세표, 최근 출하 단가") }}
+  </div>
+  {{ area("damage.emergency", "응급조치사항", "액화산소 공급, 사료 공급 중단 등") }}
+  {{ area("damage.other", "기타 사항") }}
+  <div class="live" id="live-rate"></div>
+</section>
+
+<!-- 5. ① 추가 질문 -->
+<section class="step" data-step="5" hidden>
+  <h2>① 자연재난 피해신고서 추가 질문</h2>
+  <p class="hint">모르면 '모름'으로 두세요. 서식에서 빈칸이 되고 검토 화면에 표시됩니다.</p>
+  {{ radios("form01.housing", "주거 형태", ["소유자(실거주)", "소유자(미거주)", "세입자", "공공임대 세입자"]) }}
+  <div class="grid">
+    {{ field("form01.family_count", "가족 수 (주민등록상 세대주와 세대원)", "number", attrs='min="0" step="1"') }}
+  </div>
+  <h3>고등학생 <small>(없으면 비움)</small></h3>
+  <div class="grid">
+    {{ field("form01.high_schools.0.school", "학교 이름 1", placeholder="통영") }}
+    {{ field("form01.high_schools.0.count", "학생 수 1", "number", attrs='min="0"') }}
+    {{ field("form01.high_schools.1.school", "학교 이름 2") }}
+    {{ field("form01.high_schools.1.count", "학생 수 2", "number", attrs='min="0"') }}
+  </div>
+  {{ radios("form01.carrier", "휴대폰 통신사", ["KT", "SKT", "LGU+", "기타"]) }}
+  <label class="check"><input type="checkbox" id="sub-same" data-ui> 휴대폰·유선전화 가입자가 피해자 본인입니다</label>
+  <div class="grid" id="sub-box">
+    {{ field("form01.mobile_subscriber.name", "휴대폰 가입자 성명") }}
+    {{ field("form01.mobile_subscriber.birth", "휴대폰 가입자 생년월일", "date") }}
+    {{ field("form01.landline_subscriber.name", "유선전화 가입자 성명") }}
+    {{ field("form01.landline_subscriber.birth", "유선전화 가입자 생년월일", "date") }}
+  </div>
+
+  <h3>시설 ① 간접 지원</h3>
+  {{ yn("form01.loan_request", "융자 신청") }}
+  {{ yn("form01.public_property", "국·공유재산 및 국유림 사용 또는 대부") }}
+
+  <h3>3. 간접 지원</h3>
+  <p class="hint">항목별 지원 여부는 간접지원 실시기관 확인을 거쳐 결정됩니다.</p>
+  {{ yn("form01.indirect.gas.answer", "도시가스 사용") }}
+  <div class="grid sub" data-show-if="form01.indirect.gas.answer=예">
+    {{ field("form01.indirect.gas.name", "도시가스 가입자명") }}
+    {{ field("form01.indirect.gas.birth", "가입자 생년월일", "date") }}
+  </div>
+  {{ yn("form01.indirect.car.answer", "자동차 소유") }}
+  <div class="grid sub" data-show-if="form01.indirect.car.answer=예">
+    {{ field("form01.indirect.car.detail", "자동차 검사 유효기간 만료일", placeholder="2027.03.31") }}
+  </div>
+  {{ yn("form01.indirect.public_housing.answer", "공공주택 임대 신청 희망") }}
+  {{ yn("form01.indirect.crisis_family.answer", "위기가족 긴급지원 희망") }}
+  {{ yn("form01.indirect.health_arrears.answer", "건강보험료 체납") }}
+  {{ yn("form01.indirect.fine_deferral.answer", "과태료 징수 유예 희망 (부과된 과태료가 있는 경우)") }}
+  {{ yn("form01.indirect.inheritance_loss.answer", "재해손실 공제 신청 희망 (상속재산 피해가 있는 경우)") }}
+
+  <h3>4. 확인 사항</h3>
+  {{ yn("form01.same_household.answer", "같은 세대의 다른 사람도 신고했나요?") }}
+  <div class="grid sub" data-show-if="form01.same_household.answer=예">{{ field("form01.same_household.detail", "내용") }}</div>
+  {{ yn("form01.other_region.answer", "다른 시·군·구에도 같은 피해를 신고했나요?") }}
+  <div class="grid sub" data-show-if="form01.other_region.answer=예">{{ field("form01.other_region.detail", "내용") }}</div>
+  {{ yn("form01.storm_insurance", "풍수해·지진재해보험 가입") }}
+  <div data-show-if="form01.storm_insurance=아니오">{{ yn("form01.storm_insurance_intent", "풍수해·지진재해보험 가입 의사") }}</div>
+</section>
+
+<!-- 6. 증빙 -->
+<section class="step" data-step="6" hidden>
+  <h2>증빙 준비</h2>
+  <p class="hint">가지고 있는 것에 체크하세요. 없는 것은 검토 화면에 준비 목록으로 나옵니다. ③에는 매매전표와 수산종자 구입(생산) 서류를 붙여야 합니다.</p>
+  <div class="checks">
+    <label class="check"><input type="checkbox" data-path="evidence.photos"> 피해 사진 (생존·폐사·빈사 개체, 양식장 전경)</label>
+    <label class="check"><input type="checkbox" data-path="evidence.sales_slips"> 매매전표 (출하·판매)</label>
+    <label class="check"><input type="checkbox" data-path="evidence.seed_docs"> 수산종자 구입(생산) 관련 서류</label>
+    <label class="check"><input type="checkbox" data-path="evidence.license_copy"> 면허(허가)증 사본</label>
+    <label class="check"><input type="checkbox" data-path="evidence.feed_receipts"> 사료 구입 영수증</label>
+    <label class="check"><input type="checkbox" data-path="evidence.measurement_records"> 현장 측정 기록 (수온·용존산소 등, 측정자·시각·위치·기기)</label>
+    <label class="check"><input type="checkbox" data-path="evidence.emergency_records"> 응급조치·사료 공급 기록</label>
+  </div>
+</section>
+
+<!-- 7. 검토·받기 -->
+<section class="step" data-step="7" hidden>
+  <h2>검토하고 서식 받기</h2>
+  <div id="review">검토 중입니다…</div>
+</section>
+
+<div class="nav">
+  <button type="button" class="btn" data-prev>이전</button>
+  <button type="button" class="btn primary" data-next>다음</button>
+</div>
+</form>
+
+<!-- 반복 줄 템플릿 -->
+<template id="tpl-stocking">
+  <div class="row-card" data-row>
+    <div class="grid">
+      <label class="field"><span class="label">품종</span><input data-field="species" placeholder="조피볼락"></label>
+      <label class="field"><span class="label">크기(cm)</span><input data-field="size_cm" type="number" step="0.1" min="0"></label>
+      <label class="field"><span class="label">무게(g)</span><input data-field="size_g" type="number" step="0.1" min="0"></label>
+      <label class="field"><span class="label">수량(kg)</span><input data-field="weight_kg" type="number" step="0.1" min="0"></label>
+      <label class="field"><span class="label">마리 수</span><input data-field="count" type="number" step="1" min="0" data-live></label>
+      <label class="field"><span class="label">입식 장소</span><input data-field="place"></label>
+      <label class="field"><span class="label">입식 일자</span><input data-field="date" type="date"></label>
+    </div>
+    <button type="button" class="row-del" aria-label="이 줄 삭제">삭제</button>
+  </div>
+</template>
+<template id="tpl-out">
+  <div class="row-card" data-row>
+    <div class="grid">
+      <label class="field"><span class="label">구분</span>
+        <select data-field="kind" data-live><option value="출하">출하(판매)</option><option value="폐사">기존 폐사</option></select></label>
+      <label class="field"><span class="label">품종</span><input data-field="species"></label>
+      <label class="field"><span class="label">입식 연도</span><input data-field="stock_year" type="number" min="2000" max="2100"></label>
+      <label class="field"><span class="label">크기(cm)</span><input data-field="size_cm" type="number" step="0.1" min="0"></label>
+      <label class="field"><span class="label">수량(kg)</span><input data-field="weight_kg" type="number" step="0.1" min="0"></label>
+      <label class="field"><span class="label">마리 수</span><input data-field="count" type="number" step="1" min="0" data-live></label>
+      <label class="field"><span class="label">판매단가(원/마리)</span><input data-field="unit_price" type="number" step="1" min="0"></label>
+      <label class="field"><span class="label">금액(천원)</span><input data-field="amount_kwon" type="number" step="0.1" min="0"></label>
+    </div>
+    <button type="button" class="row-del" aria-label="이 줄 삭제">삭제</button>
+  </div>
+</template>
+<template id="tpl-feed">
+  <div class="row-card" data-row>
+    <div class="grid">
+      <label class="field"><span class="label">구입일자</span><input data-field="date" type="date"></label>
+      <label class="field"><span class="label">구입처</span><input data-field="supplier"></label>
+      <label class="field"><span class="label">전화번호</span><input data-field="phone" type="tel"></label>
+      <label class="field"><span class="label">사료명</span><input data-field="name"></label>
+      <label class="field"><span class="label">수량</span><input data-field="qty" placeholder="40포"></label>
+      <label class="field"><span class="label">구입단가(원)</span><input data-field="unit_price" type="number" step="1" min="0"></label>
+    </div>
+    <button type="button" class="row-del" aria-label="이 줄 삭제">삭제</button>
+  </div>
+</template>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}

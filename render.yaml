@@ -1,0 +1,11 @@
+# Render 배포 설정 (Blueprint). 무료 인스턴스는 15분 동안 접속이 없으면 잠들고,
+# 다시 깨어날 때 약 1분 걸린다. 파일 저장소는 재시작하면 지워진다 (지도에 새로 올린 값 포함).
+services:
+  - type: web
+    name: aquaclaim
+    runtime: python
+    plan: free
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    healthCheckPath: /healthz

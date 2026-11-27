@@ -6,3 +6,4 @@ venv/
 .env
 data/farms_added.json
 *.log
+_hangul_check/
